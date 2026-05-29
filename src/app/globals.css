@@ -1,26 +1,172 @@
+/* =============================================================================
+   FILE: src/app/globals.css
+   PURPOSE: Global stylesheet for 1N599 Labs website.
+            Defines CSS custom properties (design tokens), Tailwind theme
+            extensions, custom animations, reusable utility classes, and
+            special effects (glass-morphism, glow cards, neural backgrounds).
+   ============================================================================= */
+
+/* Import TailwindCSS v4 — provides utility classes (flex, grid, colors, etc.) */
 @import "tailwindcss";
 
+/* =============================================================================
+   CSS CUSTOM PROPERTIES (Design Tokens)
+   These variables define the core color palette for the entire application.
+   Changing these values here updates the look site-wide.
+   ============================================================================= */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #030712;       /* Page background: very dark blue-gray (gray-950) */
+  --foreground: #f1f5f9;       /* Primary text color: light slate (slate-100) */
+  --accent: #06b6d4;           /* Primary accent: cyan-500 (tech/innovation) */
+  --accent-secondary: #8b5cf6; /* Secondary accent: violet-500 (AI/intelligence) */
 }
 
+/* =============================================================================
+   TAILWIND v4 THEME EXTENSION
+   @theme inline tells Tailwind to register these as design tokens that can
+   be used in utility classes (e.g., bg-background, text-foreground).
+   ============================================================================= */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);            /* Maps to bg-background utility */
+  --color-foreground: var(--foreground);            /* Maps to text-foreground utility */
+  --color-accent: var(--accent);                    /* Maps to text-accent utility */
+  --color-accent-secondary: var(--accent-secondary); /* Maps to text-accent-secondary */
+  --font-sans: var(--font-geist-sans);              /* Maps Geist Sans as default sans font */
+  --font-mono: var(--font-geist-mono);              /* Maps Geist Mono as default mono font */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* =============================================================================
+   GLOBAL BASE STYLES
+   Applied to all elements or the body element.
+   ============================================================================= */
+
+/* Enable smooth scrolling for anchor link navigation (e.g., clicking nav links) */
+* {
+  scroll-behavior: smooth;
 }
 
+/* Body base styles: sets the dark background, light text, and font family */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #030712;                               /* Dark background — explicit fallback */
+  color: #f1f5f9;                                    /* Light text — explicit fallback */
+  font-family: var(--font-sans), system-ui, sans-serif; /* Geist Sans with system fallbacks */
+}
+
+/* =============================================================================
+   KEYFRAME ANIMATIONS
+   Reusable @keyframes definitions for various animated effects.
+   ============================================================================= */
+
+/* Float animation: element gently bobs up and down (20px range) */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }   /* Start and end at original position */
+  50% { transform: translateY(-20px); }       /* Rise 20px at midpoint */
+}
+
+/* Pulse glow: element fades between 40% and 100% opacity */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }                 /* Dim at start and end */
+  50% { opacity: 1; }                         /* Bright at midpoint */
+}
+
+/* Gradient shift: moves a 200% background-size gradient left to right and back */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }        /* Start: gradient aligned left */
+  50% { background-position: 100% 50%; }     /* Middle: gradient aligned right */
+  100% { background-position: 0% 50%; }      /* End: back to left (loops seamlessly) */
+}
+
+/* =============================================================================
+   ANIMATION UTILITY CLASSES
+   Apply these classes to elements that need pre-built animations.
+   ============================================================================= */
+
+/* Applies the floating bob animation — 6 second cycle, infinite loop */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Applies the pulse glow opacity animation — 3 second cycle, infinite loop */
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* =============================================================================
+   GRADIENT TEXT EFFECT
+   Makes text display a moving gradient color (cyan → violet → pink).
+   The background-clip technique clips a gradient to the text shape.
+   ============================================================================= */
+.gradient-text {
+  /* Fallback text color in case gradient-clip is not supported */
+  color: #06b6d4;
+  /* The gradient itself: 135° angle through brand colors */
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899);
+  /* 200% size allows the animation to shift the visible portion */
+  background-size: 200% 200%;
+  /* Animate the gradient position — creates a shimmering/flowing effect */
+  animation: gradient-shift 4s ease infinite;
+  /* Clip the background to only show through the text glyphs (WebKit) */
+  -webkit-background-clip: text;
+  /* Make the actual text color transparent so gradient shows through */
+  -webkit-text-fill-color: transparent;
+  /* Standard property for background-clip (non-WebKit browsers) */
+  background-clip: text;
+}
+
+/* =============================================================================
+   GLASS-MORPHISM UTILITY
+   Creates a frosted-glass appearance: semi-transparent background with
+   backdrop blur and subtle border. Used for cards, navbar, etc.
+   ============================================================================= */
+.glass {
+  background: rgba(255, 255, 255, 0.03);  /* Nearly transparent white tint */
+  backdrop-filter: blur(12px);             /* Blurs content behind the element */
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Very subtle white border */
+}
+
+/* =============================================================================
+   GLOW CARD EFFECT
+   Cards that show a gradient border glow on hover. Uses a ::before pseudo-
+   element with mask-composite to create a border-only gradient effect.
+   ============================================================================= */
+.glow-card {
+  position: relative;  /* Required for absolute-positioned ::before */
+  overflow: hidden;    /* Clips the ::before element within border-radius */
+}
+
+/* Pseudo-element creates the gradient border effect */
+.glow-card::before {
+  content: '';                              /* Required for pseudo-element to render */
+  position: absolute;                      /* Positioned relative to .glow-card */
+  inset: -1px;                             /* Extends 1px beyond parent on all sides */
+  border-radius: inherit;                  /* Matches parent's border-radius */
+  padding: 1px;                            /* Creates 1px "border" thickness */
+  /* Gradient used for the border glow (cyan → violet → pink) */
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.1));
+  /* Mask trick: shows gradient only in the 1px border area, not the fill */
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;            /* XOR composites inner and outer masks */
+  mask-composite: exclude;                 /* Standard property for mask compositing */
+  opacity: 0;                              /* Hidden by default */
+  transition: opacity 0.4s ease;           /* Smooth fade-in on hover */
+}
+
+/* Show the gradient border when card is hovered */
+.glow-card:hover::before {
+  opacity: 1;                              /* Fully visible on hover */
+}
+
+/* =============================================================================
+   NEURAL BACKGROUND PATTERN
+   Multiple overlapping radial gradients creating a subtle, colorful ambient
+   glow effect. Used as section backgrounds to add visual depth.
+   ============================================================================= */
+.neural-bg {
+  background-image:
+    /* Cyan glow on the left side */
+    radial-gradient(ellipse at 20% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+    /* Violet glow in the upper right */
+    radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+    /* Pink glow in the lower right */
+    radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
 }

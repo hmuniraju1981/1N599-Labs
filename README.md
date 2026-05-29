@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 1N599 Labs
+
+**"For you always"**
+
+AI startup building intelligent products for Real Estate, HR, and Healthcare industries.
+
+🌐 [1n599labs.com](https://1n599labs.com)
+
+## Tech Stack
+
+- **Next.js 16** — React framework with App Router
+- **TailwindCSS v4** — Utility-first CSS
+- **Framer Motion** — Animations and transitions
+- **React Three Fiber + Three.js** — 3D particle/neural network visualization
+- **Lucide React** — Icon library
+- **TypeScript** — Type safety
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+Static output is generated in the `out/` directory.
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy to Cloudflare Pages
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Push this repo to GitHub
+2. Go to [Cloudflare Pages](https://dash.cloudflare.com/) → Pages → Create a project
+3. Connect your GitHub repository
+4. Configure build settings:
+   - **Framework preset**: Next.js (Static HTML Export)
+   - **Build command**: `npm run build`
+   - **Build output directory**: `out`
+5. Deploy
+6. In your Cloudflare dashboard, go to your domain (1n599labs.com) → DNS
+7. Add a CNAME record pointing to your Pages project (e.g., `1n599-labs.pages.dev`)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+All on the **free tier** — no costs.
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+├── app/                          # Next.js App Router (pages & layouts)
+│   ├── globals.css               #   Global styles, animations, theme tokens
+│   ├── layout.tsx                #   Root layout (fonts, metadata, <html>/<body>)
+│   └── page.tsx                  #   Main landing page (composes all sections)
+│
+├── components/                   # React components (organized by concern)
+│   ├── ui/                       #   Reusable UI primitives
+│   │   ├── index.ts              #     Barrel exports
+│   │   ├── Logo.tsx              #     Animated SVG brand logo
+│   │   └── Navbar.tsx            #     Fixed nav with glass-morphism + mobile menu
+│   ├── sections/                 #   Page-level section components
+│   │   ├── index.ts              #     Barrel exports
+│   │   ├── Hero.tsx              #     Full-screen hero with 3D background + CTAs
+│   │   ├── About.tsx             #     Company intro + 3 feature cards
+│   │   ├── Products.tsx          #     Industry domain cards (RE/HR/Healthcare)
+│   │   ├── Mission.tsx           #     "For you always" statement + stats
+│   │   ├── Founder.tsx           #     Founder profile + social links
+│   │   └── Contact.tsx           #     Contact info, form, and footer
+│   └── three/                    #   Three.js / WebGL 3D components
+│       ├── index.ts              #     Barrel exports
+│       └── ParticleField.tsx     #     Particles + neural network scene
+│
+├── hooks/                        # Custom React hooks
+│   ├── index.ts                  #   Barrel exports
+│   └── useAnimateInView.ts       #   Scroll-triggered animation hook
+│
+├── lib/                          # Utilities & configuration
+│   ├── constants.ts              #   App-wide constants (nav links, company info, colors)
+│   └── utils.ts                  #   Helper functions (cn class merger)
+│
+└── types/                        # TypeScript type definitions
+    └── index.ts                  #   Shared interfaces (NavLink, Product, Feature, etc.)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Architecture Principles
+
+- **Separation of Concerns**: UI primitives, page sections, 3D scenes, hooks, and data are all in dedicated folders
+- **Barrel Exports**: Each folder has an `index.ts` for clean, short imports
+- **Constants Extraction**: All content/data lives in `lib/constants.ts`, keeping components logic-focused
+- **Custom Hooks**: Reusable stateful logic abstracted into `hooks/`
+- **Type Safety**: All shared data shapes defined in `types/`
+- **Every line commented**: Comprehensive inline documentation for learning and maintenance
+
+## License
+
+Proprietary — 1N599 Labs © 2024
