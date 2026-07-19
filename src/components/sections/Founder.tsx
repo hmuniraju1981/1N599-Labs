@@ -108,7 +108,7 @@ export default function Founder() {
         <footer className="mt-20 pt-8 border-t border-white/10">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <span className="text-xl font-bold tracking-tight text-white">
-              <span className="gradient-text">1N599</span> Labs
+              <span className="gradient-text">1N599 Labs</span> Inc
             </span>
             <p className="text-sm text-slate-400">
               &copy; {new Date().getFullYear()} {COMPANY.name}. All rights reserved.

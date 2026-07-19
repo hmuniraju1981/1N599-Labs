@@ -38,10 +38,10 @@ const geistMono = Geist_Mono({
 // -----------------------------------------------------------------------------
 export const metadata: Metadata = {
   // Browser tab title
-  title: "1N599 Labs | AI Solutions for Real Estate, HR & Healthcare",
+  title: "1N599 Labs Inc | AI Solutions for Real Estate, HR & Healthcare",
   // Meta description for search engines (max ~160 chars recommended)
   description:
-    "1N599 Labs builds intelligent AI products transforming Real Estate, HR, and Healthcare industries. For you always.",
+    "1N599 Labs Inc builds intelligent AI products transforming Real Estate, HR, and Healthcare industries. For you always.",
   // SEO keywords (less impactful for modern Google but still used by other engines)
   keywords: [
     "AI",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     "real estate AI",
     "HR technology",
     "healthcare AI",
-    "1N599 Labs",
+    "1N599 Labs Inc",
   ],
   // Author metadata
   authors: [{ name: "Harsha Muniraju" }],
@@ -59,11 +59,11 @@ export const metadata: Metadata = {
   },
   // OpenGraph metadata — controls how the site appears when shared on social media
   openGraph: {
-    title: "1N599 Labs | Engineering Intelligence, Empowering Humanity", // Social share title
+    title: "1N599 Labs Inc | Engineering Intelligence, Empowering Humanity", // Social share title
     description:
       "AI-powered solutions transforming Real Estate, HR, and Healthcare.", // Social share description
-    url: "https://1n599labs.com",                   // Canonical URL
-    siteName: "1N599 Labs",                         // Site name for social platforms
+    url: "https://1n599labs.ai",                    // Canonical URL
+    siteName: "1N599 Labs Inc",                       // Site name for social platforms
     type: "website",                                 // Content type (website, article, etc.)
   },
 };

@@ -91,7 +91,7 @@ export default function Contact() {
       <footer className="mt-32 pt-8 border-t border-white/5">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="text-xl font-bold tracking-tight text-white">
-            <span className="gradient-text">1N599</span> Labs
+            <span className="gradient-text">1N599 Labs</span> Inc
           </span>
           <p className="text-sm text-slate-500">
             &copy; {new Date().getFullYear()} {COMPANY.name}. All rights reserved.

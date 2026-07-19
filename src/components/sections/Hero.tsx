@@ -43,8 +43,8 @@ export default function Hero() {
         </div>
 
         <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-          <span className="gradient-text">1N599</span>
-          <span className="text-white"> Labs</span>
+          <span className="gradient-text">1N599 Labs</span>
+          <span className="text-white"> Inc</span>
         </h1>
 
         <p className="text-xl sm:text-2xl text-slate-400 mb-4 font-light">

@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: src/components/sections/About.tsx
-// PURPOSE: Introduces 1N599 Labs with a brief description and three feature
+// PURPOSE: Introduces 1N599 Labs Inc with a brief description and three feature
 //          cards highlighting the company's core differentiators:
 //          AI-First Approach, Domain Expertise, and Rapid Innovation.
 // =============================================================================
@@ -42,7 +42,7 @@ export default function About() {
             Building the <span className="gradient-text">Future</span> with AI
           </h2>
           <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
-            1N599 Labs is an AI startup focused on creating intelligent products
+            1N599 Labs Inc is an AI startup focused on creating intelligent products
             that transform how people interact with technology across critical
             industries. We believe AI should serve humanity — always.
           </p>

@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: src/types/index.ts
-// PURPOSE: Central type definitions for the 1N599 Labs application.
+// PURPOSE: Central type definitions for the 1N599 Labs Inc application.
 //          All shared TypeScript interfaces and types are declared here
 //          to maintain a single source of truth for data shapes.
 // =============================================================================
@@ -57,5 +57,5 @@ export interface SocialLink {
 // -----------------------------------------------------------------------------
 export interface LogoProps {
   size?: number;      // Width and height of the SVG in pixels (default: 48)
-  showText?: boolean; // Whether to display the "1N599 Labs" text beside the logo
+  showText?: boolean; // Whether to display the "1N599 Labs Inc" text beside the logo
 }

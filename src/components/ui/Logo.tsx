@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: src/components/ui/Logo.tsx
-// PURPOSE: Renders the 1N599 Labs brand logo as an animated SVG.
+// PURPOSE: Renders the 1N599 Labs Inc brand logo as an animated SVG.
 //          Hexagonal frame with neural network nodes — symbolizing AI.
 // =============================================================================
 
@@ -68,8 +68,8 @@ export default function Logo({ size = 48, showText = true }: { size?: number; sh
 
       {showText && (
         <span className="text-xl font-bold tracking-tight">
-          <span className="gradient-text">1N599</span>
-          <span className="text-white ml-1">Labs</span>
+          <span className="gradient-text">1N599 Labs</span>
+          <span className="text-white"> Inc</span>
         </span>
       )}
     </div>

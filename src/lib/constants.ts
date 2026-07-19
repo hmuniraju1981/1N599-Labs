@@ -34,9 +34,9 @@ export const MISSION_STATS: Stat[] = [
 // Centralized company details used across Contact and Footer components.
 // -----------------------------------------------------------------------------
 export const COMPANY = {
-  name: "1N599 Labs",                              // Legal company name
-  domain: "1n599labs.com",                         // Primary domain
-  email: "contact@1n599labs.com",                  // Public contact email
+  name: "1N599 Labs Inc",                            // Legal company name
+  domain: "1n599labs.ai",                          // Primary domain
+  email: "contact@1n599labs.ai",                   // Public contact email
   address: {
     street: "401 Forsyth Drive",                   // Street address
     city: "Princeton",                             // City

@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: src/app/page.tsx
-// PURPOSE: Main landing page of the 1N599 Labs website.
+// PURPOSE: Main landing page of the 1N599 Labs Inc website.
 //          This is a Server Component that composes all page sections together.
 //          Each section is a separate client component imported from the
 //          components directory, following the "sections" pattern.

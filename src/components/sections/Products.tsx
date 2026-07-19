@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: src/components/sections/Products.tsx
-// PURPOSE: Showcases the three industry verticals 1N599 Labs operates in:
+// PURPOSE: Showcases the three industry verticals 1N599 Labs Inc operates in:
 //          Real Estate, Human Resources, and Healthcare.
 //          Each card features a domain-specific background image.
 // =============================================================================
