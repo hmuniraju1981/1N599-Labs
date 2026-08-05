@@ -38,11 +38,11 @@ export const COMPANY = {
   domain: "1n599labs.ai",                          // Primary domain
   email: "contact@1n599labs.ai",                   // Public contact email
   address: {
-    street: "401 Forsyth Drive",                   // Street address
-    city: "Princeton",                             // City
-    state: "Texas",                                // State
-    zip: "75407",                                  // ZIP code
-    full: "401 Forsyth Drive, Princeton, Texas 75407", // Combined full address
+    street: "5900 Balcones Drive # 8394",          // Street address
+    city: "Austin",                                // City
+    state: "TX",                                   // State
+    zip: "78731",                                  // ZIP code
+    full: "5900 Balcones Drive # 8394, Austin, TX 78731", // Combined full address
   },
   mission: "Engineering intelligence, empowering humanity", // Company mission statement
   founder: {

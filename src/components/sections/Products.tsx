@@ -18,6 +18,7 @@ const products = [
     bgAccent: "from-cyan-500/10 to-blue-500/10",
     image: "/images/real-estate.jpg",
     overlay: "from-[#030712]/90 via-[#030712]/80 to-cyan-950/70",
+    href: "https://elara-ai-labs.com",
   },
   {
     icon: <Users className="w-10 h-10" />,
@@ -29,6 +30,7 @@ const products = [
     bgAccent: "from-violet-500/10 to-purple-500/10",
     image: "/images/hr.jpg",
     overlay: "from-[#030712]/90 via-[#030712]/80 to-violet-950/70",
+    href: undefined as string | undefined,
   },
   {
     icon: <HeartPulse className="w-10 h-10" />,
@@ -40,6 +42,7 @@ const products = [
     bgAccent: "from-pink-500/10 to-rose-500/10",
     image: "/images/healthcare.jpg",
     overlay: "from-[#030712]/90 via-[#030712]/80 to-pink-950/70",
+    href: undefined as string | undefined,
   },
 ];
 
@@ -66,46 +69,53 @@ export default function Products() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {products.map((product) => (
-            <div
-              key={product.domain}
-              className="relative rounded-3xl overflow-hidden group transition-all duration-500 flex flex-col border border-white/10 hover:border-white/20"
-            >
-              {/* Background image */}
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                style={{ backgroundImage: `url(${product.image})` }}
-              />
-              {/* Dark gradient overlay for text readability */}
-              <div className={`absolute inset-0 bg-gradient-to-b ${product.overlay}`} />
+          {products.map((product) => {
+            const Wrapper = product.href ? "a" : "div";
+            const wrapperProps = product.href
+              ? { href: product.href, target: "_blank" as const, rel: "noopener noreferrer" }
+              : {};
+            return (
+              <Wrapper
+                key={product.domain}
+                {...wrapperProps}
+                className="relative rounded-3xl overflow-hidden group transition-all duration-500 flex flex-col border border-white/10 hover:border-white/20 cursor-pointer"
+              >
+                {/* Background image */}
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                  style={{ backgroundImage: `url(${product.image})` }}
+                />
+                {/* Dark gradient overlay for text readability */}
+                <div className={`absolute inset-0 bg-gradient-to-b ${product.overlay}`} />
 
-              {/* Card content */}
-              <div className="relative z-10 p-8 flex flex-col flex-1">
-                <div
-                  className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${product.bgAccent} backdrop-blur-sm flex items-center justify-center ${product.accentColor} mb-6 group-hover:scale-110 transition-transform duration-300`}
-                >
-                  {product.icon}
+                {/* Card content */}
+                <div className="relative z-10 p-8 flex flex-col flex-1">
+                  <div
+                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${product.bgAccent} backdrop-blur-sm flex items-center justify-center ${product.accentColor} mb-6 group-hover:scale-110 transition-transform duration-300`}
+                  >
+                    {product.icon}
+                  </div>
+                  <span
+                    className={`text-sm font-semibold ${product.accentColor} uppercase tracking-wider mb-2`}
+                  >
+                    {product.domain}
+                  </span>
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    {product.title}
+                  </h3>
+                  <p className="text-slate-300 leading-relaxed flex-1 mb-6">
+                    {product.description}
+                  </p>
+                  <div
+                    className={`flex items-center gap-2 ${product.accentColor} text-sm font-medium group-hover:gap-3 transition-all duration-300`}
+                  >
+                    <span>{product.href ? "Visit Platform" : "Coming Soon"}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
-                <span
-                  className={`text-sm font-semibold ${product.accentColor} uppercase tracking-wider mb-2`}
-                >
-                  {product.domain}
-                </span>
-                <h3 className="text-2xl font-bold text-white mb-4">
-                  {product.title}
-                </h3>
-                <p className="text-slate-300 leading-relaxed flex-1 mb-6">
-                  {product.description}
-                </p>
-                <div
-                  className={`flex items-center gap-2 ${product.accentColor} text-sm font-medium group-hover:gap-3 transition-all duration-300`}
-                >
-                  <span>Learn More</span>
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              </div>
-            </div>
-          ))}
+              </Wrapper>
+            );
+          })}
         </div>
       </div>
     </section>
