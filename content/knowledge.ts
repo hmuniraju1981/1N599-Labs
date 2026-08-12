@@ -133,6 +133,8 @@ export const ASSISTANT_UI = {
   errorMessage: "Something went wrong reaching the assistant.",
   rateLimitMessage:
     "You've sent a lot of messages in a short window. Give it a few minutes and try again.",
+  busyMessage:
+    "The assistant is handling a lot of requests right now. Try again in a moment.",
 } as const;
 
 // -----------------------------------------------------------------------------

@@ -68,7 +68,12 @@ export default function AiAssistant() {
         });
 
         if (res.status === 429) {
-          setError(ASSISTANT_UI.rateLimitMessage);
+          // Two different causes share this status: our own per-IP limit, and
+          // the model provider throttling us. They need different wording.
+          const body = await res.json().catch(() => null);
+          const isUpstream =
+            (body as { error?: string } | null)?.error === "upstream_busy";
+          setError(isUpstream ? ASSISTANT_UI.busyMessage : ASSISTANT_UI.rateLimitMessage);
           return;
         }
         if (!res.ok || !res.body) {

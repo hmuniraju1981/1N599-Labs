@@ -66,11 +66,48 @@ const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 // rather than going dark, and a Cloudflare WAF rate-limiting rule on this route
 // is the backstop that protects API spend. A KV blip should not break the site.
 // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Collapses a client address to the unit we want to rate limit.
+//
+// IPv4 is used as-is. IPv6 is truncated to its /64 prefix, because a single
+// client is routinely allocated a whole /64 (or larger). Keying on the full
+// address would let anyone increment one hextet to mint a fresh quota, making
+// the limit meaningless — the logs confirmed Cloudflare hands us full IPv6
+// addresses, e.g. 2603:8082:af00:3cf:d918:e843:7b7d:9001.
+//
+// Consequence, and it is intended: everyone behind one /64 (typically one
+// household) shares a single quota.
+// -----------------------------------------------------------------------------
+export function rateLimitKey(ip: string): string {
+  if (!ip.includes(":")) return ip; // IPv4, or the "unknown" fallback.
+
+  // IPv4-mapped IPv6 (::ffff:203.0.113.5) — limit on the embedded IPv4.
+  const mapped = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+  if (mapped) return mapped[1];
+
+  // Expand "::" so the prefix is taken from the true hextet positions.
+  let groups: string[];
+  if (ip.includes("::")) {
+    const [head, tail] = ip.split("::");
+    const headParts = head ? head.split(":") : [];
+    const tailParts = tail ? tail.split(":") : [];
+    const gap = Math.max(0, 8 - headParts.length - tailParts.length);
+    groups = [...headParts, ...Array(gap).fill("0"), ...tailParts];
+  } else {
+    groups = ip.split(":");
+  }
+
+  return groups
+    .slice(0, 4)
+    .map((h) => (h || "0").toLowerCase())
+    .join(":");
+}
+
 async function isRateLimited(ip: string, store?: KVNamespace): Promise<boolean> {
   // No binding configured (e.g. local dev without --kv): skip, do not block.
   if (!store) return false;
 
-  const key = `rl:${ip}`;
+  const key = `rl:${rateLimitKey(ip)}`;
   const now = Date.now();
   const cutoff = now - RATE_LIMIT_WINDOW_MS;
 
@@ -265,7 +302,16 @@ export const onRequestPost = async (context: {
   if (!upstream.ok || !upstream.body) {
     // Log the provider's reason server-side; never forward it to the client,
     // since provider errors can echo request details.
-    console.error("Groq request failed", upstream.status, await upstream.text().catch(() => ""));
+    const detail = await upstream.text().catch(() => "");
+    console.error("Groq request failed", upstream.status, detail);
+
+    // The provider throttling us is a distinct, recoverable condition. Masking
+    // it as a generic 502 told users "something went wrong" when the honest
+    // answer is "we are busy, try again shortly".
+    if (upstream.status === 429) {
+      return json({ error: "upstream_busy" }, 429);
+    }
+
     return json({ error: "The assistant is temporarily unavailable." }, 502);
   }
 
