@@ -39,7 +39,7 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+      <div className="hero-text-layer relative z-10 text-center px-6 max-w-5xl mx-auto">
         <div className="flex justify-center mb-5">
           <Logo size={96} showText={false} />
         </div>
