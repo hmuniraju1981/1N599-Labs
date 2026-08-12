@@ -11,6 +11,7 @@
 import type { Metadata } from "next";              // Next.js metadata type for SEO
 import { Geist, Geist_Mono } from "next/font/google"; // Google Fonts with next/font optimization
 import "./globals.css";                            // Global stylesheet import
+import ScrollToTop from "@/components/ui/ScrollToTop"; // Resets scroll to top on load
 
 // -----------------------------------------------------------------------------
 // FONT CONFIGURATION
@@ -38,18 +39,18 @@ const geistMono = Geist_Mono({
 // -----------------------------------------------------------------------------
 export const metadata: Metadata = {
   // Browser tab title
-  title: "1N599 Labs Inc | AI Solutions for Real Estate, HR & Healthcare",
+  title: "1N599 Inc | AI Products Built for Any Industry",
   // Meta description for search engines (max ~160 chars recommended)
   description:
-    "1N599 Labs Inc builds intelligent AI products transforming Real Estate, HR, and Healthcare industries. For you always.",
+    "1N599 Inc is a product-based AI company with a real estate product, building and customizing intelligent products for opportunities in any industry.",
   // SEO keywords (less impactful for modern Google but still used by other engines)
   keywords: [
     "AI",
     "artificial intelligence",
+    "AI products",
     "real estate AI",
-    "HR technology",
-    "healthcare AI",
-    "1N599 Labs Inc",
+    "custom AI product development",
+    "1N599 Inc",
   ],
   // Author metadata
   authors: [{ name: "Harsha Muniraju" }],
@@ -59,11 +60,11 @@ export const metadata: Metadata = {
   },
   // OpenGraph metadata — controls how the site appears when shared on social media
   openGraph: {
-    title: "1N599 Labs Inc | Engineering Intelligence, Empowering Humanity", // Social share title
+    title: "1N599 Inc | Engineering Intelligence, Empowering Humanity", // Social share title
     description:
-      "AI-powered solutions transforming Real Estate, HR, and Healthcare.", // Social share description
-    url: "https://1n599labs.ai",                    // Canonical URL
-    siteName: "1N599 Labs Inc",                       // Site name for social platforms
+      "Product-based AI innovation, proven in real estate and customizable for any industry.", // Social share description
+    url: "https://1n599inc.ai",                     // Canonical URL
+    siteName: "1N599 Inc",                            // Site name for social platforms
     type: "website",                                 // Content type (website, article, etc.)
   },
 };
@@ -95,6 +96,7 @@ export default function RootLayout({
           - flex flex-col: allows children to use flex-grow for full-height layouts
           - bg/text colors: fallback dark theme colors (matches CSS custom props) */}
       <body className="min-h-full flex flex-col bg-[#030712] text-[#f1f5f9]">
+        <ScrollToTop /> {/* Forces every visit to start at the top of the page */}
         {children} {/* Current page content renders here */}
       </body>
     </html>
