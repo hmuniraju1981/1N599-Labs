@@ -98,6 +98,8 @@ export default function Starfield() {
 
       return {
         x: Math.cos(angle) * radius * (width / 2),
+        // Scaled by the same factor used for the vanishing point, so seeded
+        // stars fill the frame evenly rather than clustering.
         y: Math.sin(angle) * radius * (height / 2),
         depth: seeded ? Math.random() : 0,
         speed: band.speed * (0.75 + Math.random() * 0.5),
@@ -125,9 +127,16 @@ export default function Starfield() {
 
     // ---------------------------------------------------------------------
     // Frame
+    //
+    // The vanishing point sits at 38% of the height, not 50%. The canvas now
+    // spans the hero AND the assistant section, so the geometric centre of the
+    // canvas falls behind the assistant card where it would be hidden. 38%
+    // puts it in the hero, roughly behind the wordmark, which is where the
+    // sense of travelling forward needs to originate.
     // ---------------------------------------------------------------------
+    const CENTRE_Y = 0.38;
     const cx = () => width / 2;
-    const cy = () => height / 2;
+    const cy = () => height * CENTRE_Y;
 
     const draw = (deltaScale: number) => {
       ctx.clearRect(0, 0, width, height);
