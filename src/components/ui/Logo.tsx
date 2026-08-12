@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: src/components/ui/Logo.tsx
-// PURPOSE: Renders the 1N599 Labs Inc brand logo as an animated SVG.
+// PURPOSE: Renders the 1N599 Inc brand logo as an animated SVG.
 //          Hexagonal frame with neural network nodes — symbolizing AI.
 // =============================================================================
 
