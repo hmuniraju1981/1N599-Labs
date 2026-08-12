@@ -5,40 +5,40 @@
 //          Each card features a domain-specific background image.
 // =============================================================================
 
-import { Building2, Users, HeartPulse, ArrowRight } from "lucide-react";
+import { BrainCircuit, Workflow, CloudCog } from "lucide-react";
 
 const products = [
   {
-    icon: <Building2 className="w-10 h-10" />,
-    domain: "Real Estate",
+    icon: <BrainCircuit className="w-10 h-10" />,
+    domain: "Real Estate Product",
     title: "Intelligent Property Solutions",
     description:
-      "AI-powered tools for property valuation, market analysis, tenant matching, and predictive maintenance that revolutionize how real estate operates.",
+      "Our existing AI-powered real estate product supports smarter property workflows, insights, and decisions for industry professionals.",
     accentColor: "text-cyan-400",
     bgAccent: "from-cyan-500/10 to-blue-500/10",
     image: "/images/real-estate.jpg",
     overlay: "from-[#030712]/90 via-[#030712]/80 to-cyan-950/70",
   },
   {
-    icon: <Users className="w-10 h-10" />,
-    domain: "Human Resources",
-    title: "Next-Gen HR Intelligence",
+    icon: <Workflow className="w-10 h-10" />,
+    domain: "Cross-Industry Products",
+    title: "Customized for Your Industry",
     description:
-      "Transform talent acquisition, employee engagement, and workforce planning with AI that understands people and organizational dynamics.",
+      "We apply our product-building experience to new opportunities, tailoring AI capabilities to your users, workflows, data, and market.",
     accentColor: "text-violet-400",
     bgAccent: "from-violet-500/10 to-purple-500/10",
-    image: "/images/hr.jpg",
+    image: "/images/team.jpg",
     overlay: "from-[#030712]/90 via-[#030712]/80 to-violet-950/70",
   },
   {
-    icon: <HeartPulse className="w-10 h-10" />,
-    domain: "Healthcare",
-    title: "AI-Driven Health Tech",
+    icon: <CloudCog className="w-10 h-10" />,
+    domain: "Product Engineering",
+    title: "From Opportunity to Launch",
     description:
-      "Cutting-edge solutions for diagnostics support, patient care optimization, and clinical workflow automation that put patients first.",
+      "Bring us an industry challenge or product opportunity. We design, build, integrate, and scale a dependable AI product around it.",
     accentColor: "text-pink-400",
     bgAccent: "from-pink-500/10 to-rose-500/10",
-    image: "/images/healthcare.jpg",
+    image: "/images/founder.jpg",
     overlay: "from-[#030712]/90 via-[#030712]/80 to-pink-950/70",
   },
 ];
@@ -47,7 +47,7 @@ export default function Products() {
   return (
     <section id="products" className="py-32 px-6 relative overflow-hidden">
       {/* Domains background — skyscrapers with bright city lights */}
-      <div className="absolute inset-0 bg-cover bg-center opacity-[0.5]" style={{ backgroundImage: 'url(/images/real-estate.jpg)' }} />
+      <div className="absolute inset-0 bg-cover bg-center opacity-[0.5]" style={{ backgroundImage: 'url(/images/domains.jpg)' }} />
       <div className="absolute inset-0 bg-[#030712]/45" />
       {/* Glowing orbs */}
       <div className="absolute top-[10%] left-[10%] w-80 h-80 bg-cyan-400/25 rounded-full blur-[100px] animate-pulse" />
@@ -57,11 +57,11 @@ export default function Products() {
 
         <div className="text-center mb-20">
           <h2 className="text-4xl sm:text-5xl font-bold mb-6 text-white">
-            Our <span className="gradient-text">Domains</span>
+            Our <span className="gradient-text">Products</span>
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            We build AI products in industries where intelligent automation
-            creates the most meaningful impact.
+            We build AI products, beginning with real estate, and customize our
+            product expertise for opportunities across any industry.
           </p>
         </div>
 
@@ -97,12 +97,6 @@ export default function Products() {
                 <p className="text-slate-300 leading-relaxed flex-1 mb-6">
                   {product.description}
                 </p>
-                <div
-                  className={`flex items-center gap-2 ${product.accentColor} text-sm font-medium group-hover:gap-3 transition-all duration-300`}
-                >
-                  <span>Learn More</span>
-                  <ArrowRight className="w-4 h-4" />
-                </div>
               </div>
             </div>
           ))}

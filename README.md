@@ -1,10 +1,10 @@
-# 1N599 Labs Inc
+# 1N599 Inc
 
 **"For you always"**
 
-AI startup building intelligent products for Real Estate, HR, and Healthcare industries.
+Product-based AI company with an existing real estate product, building and customizing intelligent products for opportunities across any industry.
 
-🌐 [1n599labs.ai](https://1n599labs.ai)
+🌐 [1n599inc.ai](https://1n599inc.ai)
 
 ## Tech Stack
 
@@ -42,7 +42,7 @@ Static output is generated in the `out/` directory.
    - **Build command**: `npm run build`
    - **Build output directory**: `out`
 5. Deploy
-6. In your Cloudflare dashboard, go to your domain (1n599labs.ai) → DNS
+6. In your Cloudflare dashboard, go to your domain (1n599inc.ai) → DNS
 7. Add a CNAME record pointing to your Pages project (e.g., `1n599-labs.pages.dev`)
 
 All on the **free tier** — no costs.
@@ -96,4 +96,4 @@ src/
 
 ## License
 
-Proprietary — 1N599 Labs Inc © 2025
+Proprietary — 1N599 Inc © 2025

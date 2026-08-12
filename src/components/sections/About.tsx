@@ -10,18 +10,18 @@ import { Brain, Sparkles, Zap } from "lucide-react";
 const features = [
   {
     icon: <Brain className="w-8 h-8" />,
-    title: "AI-First Approach",
-    desc: "Every product is built with artificial intelligence at its core, not bolted on as an afterthought.",
+    title: "Product-First Innovation",
+    desc: "We create focused AI products that solve real business problems and deliver lasting value.",
   },
   {
     icon: <Sparkles className="w-8 h-8" />,
-    title: "Domain Expertise",
-    desc: "Deep understanding of Real Estate, HR, and Healthcare industries drives our product design.",
+    title: "Proven in Real Estate",
+    desc: "Our real estate product applies AI to practical industry needs and provides a foundation for continued innovation.",
   },
   {
     icon: <Zap className="w-8 h-8" />,
-    title: "Rapid Innovation",
-    desc: "From concept to deployment, we move fast to bring transformative solutions to market.",
+    title: "Built to Customize",
+    desc: "We adapt our product expertise to new opportunities, workflows, and customers in any industry.",
   },
 ];
 
@@ -42,9 +42,10 @@ export default function About() {
             Building the <span className="gradient-text">Future</span> with AI
           </h2>
           <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
-            1N599 Labs Inc is an AI startup focused on creating intelligent products
-            that transform how people interact with technology across critical
-            industries. We believe AI should serve humanity — always.
+            1N599 Inc is a product-based AI company. We have built a real estate
+            product and continue to create intelligent products that solve practical
+            business problems. We also welcome opportunities to build and customize
+            AI products for organizations in any industry.
           </p>
         </div>
 
