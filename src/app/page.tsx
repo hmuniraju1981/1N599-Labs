@@ -9,6 +9,7 @@
 
 import Navbar from "@/components/ui/Navbar";             // Fixed top navigation bar
 import Hero from "@/components/sections/Hero";           // Full-screen hero
+import AiAssistant from "@/components/sections/AiAssistant"; // AI assistant, directly below hero
 import About from "@/components/sections/About";         // Company introduction + feature cards
 import Products from "@/components/sections/Products";   // Industry domain showcase cards
 import Mission from "@/components/sections/Mission";     // Mission statement + stats
@@ -26,6 +27,7 @@ export default function Home() {
     <main className="relative">
       <Navbar />    {/* Sticky navigation — always visible at top */}
       <Hero />      {/* #hero — landing with logo, CTAs */}
+      <AiAssistant /> {/* #assistant — ask about products, platform, roadmap */}
       <About />     {/* #about — AI-first, domain expertise, rapid innovation */}
       <Products />  {/* #products — Real Estate, HR, Healthcare cards */}
       <Mission />   {/* #mission — mission statement + stats */}

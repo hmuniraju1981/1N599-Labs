@@ -12,7 +12,10 @@ import Logo from "@/components/ui/Logo";
 
 export default function Hero() {
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    // 78vh rather than a full screen: this leaves the top of the AI assistant
+    // card visible below the fold on a standard laptop, so visitors see it on
+    // landing instead of having to guess it is there. pt-20 clears the fixed navbar.
+    <section id="hero" className="relative min-h-[78vh] flex items-center justify-center overflow-hidden pt-20 pb-8">
 
       {/* Background — digital globe/network visualization */}
       <div className="absolute inset-0 z-0">
@@ -38,20 +41,20 @@ export default function Hero() {
       <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
 
         {/* Large logo mark displayed prominently */}
-        <div className="flex justify-center mb-8">
-          <Logo size={120} showText={false} />
+        <div className="flex justify-center mb-5">
+          <Logo size={96} showText={false} />
         </div>
 
-        <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-          <span className="gradient-text">1N599 Labs</span>
+        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-4">
+          <span className="gradient-text">1N599</span>
           <span className="text-white"> Inc</span>
         </h1>
 
-        <p className="text-xl sm:text-2xl text-slate-400 mb-4 font-light">
-          Intelligent AI for industries that matter
+        <p className="text-lg sm:text-xl text-slate-400 mb-3 font-light">
+          AI products built to adapt across industries
         </p>
 
-        <p className="text-3xl sm:text-4xl font-semibold italic text-slate-200 mb-12">
+        <p className="text-2xl sm:text-3xl font-semibold italic text-slate-200 mb-8">
           &ldquo;Engineering intelligence, empowering humanity&rdquo;
         </p>
 
@@ -71,12 +74,9 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll indicator — CSS animation only */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
-        <div className="w-6 h-10 rounded-full border-2 border-slate-600 flex items-start justify-center p-2 animate-bounce">
-          <div className="w-1 h-2 rounded-full bg-cyan-400" />
-        </div>
-      </div>
+      {/* NOTE: the old scroll-indicator glyph lived here. It was removed when the
+          hero shrank to 78vh — the AI assistant card now peeks above the fold and
+          serves as the scroll affordance, and the glyph collided with it. */}
     </section>
   );
 }

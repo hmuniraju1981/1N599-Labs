@@ -31,9 +31,9 @@ export default function Founder() {
         {/* Team description card */}
         <div className="glow-card glass rounded-3xl p-8 sm:p-10 mb-12 text-center max-w-3xl mx-auto">
           <p className="text-lg text-slate-200 leading-relaxed">
-            Our team of engineers and researchers is passionate about leveraging AI
-            to solve real-world problems across Real Estate, HR, and Healthcare.
-            We build products that put people first and technology in service of humanity.
+            Our team builds and grows intelligent products, starting with our real estate
+            solution. We also welcome product opportunities in any industry and can customize
+            AI capabilities around your market, workflows, users, and goals.
           </p>
         </div>
 
@@ -50,11 +50,8 @@ export default function Founder() {
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-slate-300 font-medium">Address</p>
-                  <p className="text-slate-400">
-                    {COMPANY.address.street}<br />
-                    {COMPANY.address.city}, {COMPANY.address.state} {COMPANY.address.zip}
-                  </p>
+                  <p className="text-slate-300 font-medium">Location</p>
+                  <p className="text-slate-400" style={{ whiteSpace: "pre-line" }}>{COMPANY.address.full}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -108,7 +105,7 @@ export default function Founder() {
         <footer className="mt-20 pt-8 border-t border-white/10">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <span className="text-xl font-bold tracking-tight text-white">
-              <span className="gradient-text">1N599 Labs</span> Inc
+              <span className="gradient-text">1N599</span> Inc
             </span>
             <p className="text-sm text-slate-400">
               &copy; {new Date().getFullYear()} {COMPANY.name}. All rights reserved.

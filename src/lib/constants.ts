@@ -24,8 +24,8 @@ export const NAV_LINKS: NavLink[] = [
 // Displayed as highlight cards within the Mission section.
 // -----------------------------------------------------------------------------
 export const MISSION_STATS: Stat[] = [
-  { number: "3", label: "Industry Verticals" },   // Number of domains we serve
-  { number: "AI", label: "First Philosophy" },     // Our core approach
+  { number: "1+", label: "AI Products & Growing" }, // Number of domains we serve
+  { number: "Any", label: "Industry Opportunity" }, // Our core approach
   { number: "∞", label: "Commitment to You" },     // Symbolizes endless dedication
 ];
 
@@ -34,15 +34,16 @@ export const MISSION_STATS: Stat[] = [
 // Centralized company details used across Contact and Footer components.
 // -----------------------------------------------------------------------------
 export const COMPANY = {
-  name: "1N599 Labs Inc",                            // Legal company name
-  domain: "1n599labs.ai",                          // Primary domain
-  email: "contact@1n599labs.ai",                   // Public contact email
+  name: "1N599 Inc",                                 // Legal company name
+  domain: "1n599inc.ai",                            // Primary domain
+  email: "contact@1n599Inc.ai",                     // Public contact email
   address: {
-    street: "401 Forsyth Drive",                   // Street address
-    city: "Princeton",                             // City
-    state: "Texas",                                // State
-    zip: "75407",                                  // ZIP code
-    full: "401 Forsyth Drive, Princeton, Texas 75407", // Combined full address
+    street: "5900 Balcones Drive",                   // Street address
+    suite: "# 8394",                                // Suite
+    city: "Austin",                                 // City
+    state: "TX",                                    // State
+    zip: "78731",                                   // ZIP code
+    full: "5900 Balcones Drive # 8394\nAustin, TX 78731", // Combined full address
   },
   mission: "Engineering intelligence, empowering humanity", // Company mission statement
   founder: {
