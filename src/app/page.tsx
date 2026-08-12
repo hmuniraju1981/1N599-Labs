@@ -8,6 +8,7 @@
 // =============================================================================
 
 import Navbar from "@/components/ui/Navbar";             // Fixed top navigation bar
+import SpaceScene from "@/components/layout/SpaceScene"; // Shared sky behind hero + assistant
 import Hero from "@/components/sections/Hero";           // Full-screen hero
 import AiAssistant from "@/components/sections/AiAssistant"; // AI assistant, directly below hero
 import About from "@/components/sections/About";         // Company introduction + feature cards
@@ -26,8 +27,13 @@ export default function Home() {
   return (
     <main className="relative">
       <Navbar />    {/* Sticky navigation — always visible at top */}
-      <Hero />      {/* #hero — landing with logo, CTAs */}
-      <AiAssistant /> {/* #assistant — ask about products, platform, roadmap */}
+      {/* Hero and assistant share ONE continuous background, so the photograph
+          and starfield run behind both instead of stopping at a hard line
+          between them. */}
+      <SpaceScene>
+        <Hero />        {/* #hero — landing with logo, CTAs */}
+        <AiAssistant /> {/* #assistant — ask about products, platform, roadmap */}
+      </SpaceScene>
       <About />     {/* #about — AI-first, domain expertise, rapid innovation */}
       <Products />  {/* #products — Real Estate, HR, Healthcare cards */}
       <Mission />   {/* #mission — mission statement + stats */}
