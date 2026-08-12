@@ -133,18 +133,28 @@ export default function AiAssistant() {
   }, [send]);
 
   return (
+    // No background of its own: this section floats over the shared sky rendered
+    // by SpaceScene. It previously carried its own glows and sat on the page's
+    // flat near-black, which is what created the visible horizontal edge.
     <section
       id="assistant"
-      className="relative w-full px-4 sm:px-6 pt-4 pb-16 overflow-hidden"
+      className="relative w-full px-4 sm:px-6 pt-4 pb-16"
     >
-      {/* Ambient glows, matching the visual language of the other sections */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[10%] left-[15%] w-72 h-64 bg-cyan-400/10 rounded-full blur-[90px]" />
-        <div className="absolute bottom-[15%] right-[15%] w-64 h-64 bg-violet-500/10 rounded-full blur-[90px]" />
-      </div>
-
       {/* ---------------------------------------------------------------- CARD */}
-      <div className="relative z-10 mx-auto w-full max-w-[760px] glass rounded-2xl overflow-hidden shadow-2xl shadow-black/40">
+      {/* Frosted glass over the sky rather than an opaque panel: the starfield
+          and the Earth stay faintly visible through it, and the outer violet
+          glow lifts it off the background instead of stamping it on. */}
+      <div
+        className="relative z-10 mx-auto w-full max-w-[760px] overflow-hidden"
+        style={{
+          background: "rgba(3,7,18,0.55)",
+          backdropFilter: "blur(20px) saturate(1.2)",
+          WebkitBackdropFilter: "blur(20px) saturate(1.2)",
+          border: "1px solid rgba(255,255,255,0.10)",
+          borderRadius: "20px",
+          boxShadow: "0 0 60px rgba(139,92,246,0.15)",
+        }}
+      >
 
         {/* -------------------------------------------------------- HEADER ROW */}
         <div className="flex items-center gap-3 px-4 sm:px-5 py-4">
@@ -164,7 +174,7 @@ export default function AiAssistant() {
         </div>
 
         {/* Thin divider under the header */}
-        <div className="h-px bg-white/10" />
+        <div className="h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
 
         {/* -------------------------------------------------- MESSAGES / BODY */}
         {/* Fixed height + internal scroll: the page never reflows or jumps. */}
@@ -191,7 +201,7 @@ export default function AiAssistant() {
                     key={prompt}
                     type="button"
                     onClick={() => submit(prompt)}
-                    className="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-[11.5px] sm:text-[13px] text-slate-300 hover:border-cyan-500/60 hover:text-cyan-300 transition-colors duration-200"
+                    className="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white/[0.07] border border-white/[0.12] backdrop-blur-sm text-[11.5px] sm:text-[13px] text-slate-200 hover:border-cyan-400/70 hover:text-cyan-200 hover:bg-white/[0.11] transition-colors duration-200"
                   >
                     {prompt}
                   </button>
@@ -212,7 +222,7 @@ export default function AiAssistant() {
                     className={
                       message.role === "user"
                         ? "max-w-[85%] rounded-2xl rounded-br-sm bg-gradient-to-br from-cyan-500/90 to-violet-600/90 px-3.5 py-2 text-[13px] sm:text-sm text-white"
-                        : "max-w-[90%] rounded-2xl rounded-bl-sm bg-white/[0.05] border border-white/10 px-3.5 py-2 text-[13px] sm:text-sm text-slate-200 whitespace-pre-wrap leading-relaxed"
+                        : "max-w-[90%] rounded-2xl rounded-bl-sm bg-white/[0.07] border border-white/[0.12] px-3.5 py-2 text-[13px] sm:text-sm text-slate-100 whitespace-pre-wrap leading-relaxed"
                     }
                   >
                     {message.content}
@@ -233,7 +243,7 @@ export default function AiAssistant() {
               {/* Waiting on the first token */}
               {isStreaming && messages[messages.length - 1]?.role === "user" && (
                 <div className="flex justify-start" aria-label="Assistant is typing">
-                  <div className="rounded-2xl rounded-bl-sm bg-white/[0.05] border border-white/10 px-3.5 py-3 flex gap-1.5">
+                  <div className="rounded-2xl rounded-bl-sm bg-white/[0.07] border border-white/[0.12] px-3.5 py-3 flex gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" />
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.15s]" />
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.3s]" />
@@ -263,7 +273,7 @@ export default function AiAssistant() {
         </div>
 
         {/* ------------------------------------------------------------ FOOTER */}
-        <div className="px-4 sm:px-5 py-4 border-t border-white/10">
+        <div className="px-4 sm:px-5 py-4 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
           <form
             onSubmit={(e) => {
               e.preventDefault(); // Enter submits without navigating.
@@ -284,7 +294,7 @@ export default function AiAssistant() {
               placeholder={ASSISTANT_UI.placeholder}
               disabled={isStreaming}
               autoComplete="off"
-              className="flex-1 min-w-0 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all disabled:opacity-60"
+              className="flex-1 min-w-0 px-4 py-2.5 rounded-xl bg-white/[0.07] border border-white/[0.12] backdrop-blur-sm text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/50 transition-all disabled:opacity-60"
             />
             <button
               type="submit"
