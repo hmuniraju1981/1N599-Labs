@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: src/components/sections/About.tsx
-// PURPOSE: Introduces 1N599 Labs Inc with a brief description and three feature
+// PURPOSE: Introduces 1N599 Inc with a brief description and three feature
 //          cards highlighting the company's core differentiators:
 //          AI-First Approach, Domain Expertise, and Rapid Innovation.
 // =============================================================================
