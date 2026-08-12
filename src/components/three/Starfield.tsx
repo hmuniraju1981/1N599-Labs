@@ -25,25 +25,46 @@
 
 import { useEffect, useRef } from "react";
 
-// Three parallax bands. Far stars are small, dim and slow; near stars are
-// larger, brighter and faster, which is what sells the depth.
+// -----------------------------------------------------------------------------
+// MOTION MODEL
+//
+// A star's radial position r runs 0 (vanishing point) to 1 (frame edge), and
+// accelerates as it approaches the viewer:  dr/dt = speed * (ACCEL_BASE + r).
+// Integrating that from r=0 to r=1 gives the crossing time:
+//
+//     t = ln((ACCEL_BASE + 1) / ACCEL_BASE) / speed
+//
+// With ACCEL_BASE = 0.25 the log term is 1.609, so `speed` is calibrated
+// directly from a desired crossing time: speed = 1.609 / seconds.
+// The near band is tuned to ~7s, which is the brief's 6-8s window.
+// -----------------------------------------------------------------------------
+const ACCEL_BASE = 0.25;
+const CROSS_LN = Math.log((ACCEL_BASE + 1) / ACCEL_BASE); // 1.609
+const NEAR_CROSS_SECONDS = 7;
+const NEAR_SPEED = CROSS_LN / NEAR_CROSS_SECONDS; // ~0.23 r/second
+
+// Parallax spread is the depth cue: the FAR band runs at 0.15x and stays dim,
+// the NEAR band at 1.0x and bright. That speed contrast is what reads as depth,
+// far more than size or brightness do on their own.
 const BANDS = [
-  { count: 60, speed: 0.028, size: [0.4, 0.9], alpha: [0.18, 0.42] },
-  { count: 40, speed: 0.055, size: [0.7, 1.4], alpha: [0.35, 0.65] },
-  { count: 20, speed: 0.095, size: [1.1, 2.1], alpha: [0.6, 0.95] },
+  { count: 100, speedMul: 0.15, size: [0.4, 0.9], alpha: [0.14, 0.34], trail: 0 },
+  { count: 50, speedMul: 0.45, size: [0.7, 1.5], alpha: [0.34, 0.62], trail: 0 },
+  { count: 30, speedMul: 1.0, size: [1.1, 2.2], alpha: [0.62, 0.98], trail: 3 },
 ] as const;
 
-const TOTAL_STARS = BANDS.reduce((n, b) => n + b.count, 0); // 120
+const TOTAL_STARS = BANDS.reduce((n, b) => n + b.count, 0); // 180
 const FRAME_MS = 1000 / 30; // 30fps throttle
 const MAX_DPR = 2;
+const TRAIL_ALPHA = 0.4; // Trails read as direction; kept well under the dot.
 
 interface Star {
-  x: number; // position relative to centre, in CSS px
-  y: number;
-  depth: number; // 0..1 — how far "toward" the viewer the star has travelled
-  speed: number;
+  dirX: number; // unit vector from the vanishing point
+  dirY: number;
+  r: number; // radial position, 0 at the vanishing point, 1 at the frame edge
+  speed: number; // r units per second
   size: number;
   alpha: number;
+  trail: number; // px of elongation along the vector; 0 for the far bands
   hue: string;
 }
 
@@ -93,18 +114,18 @@ export default function Starfield() {
     // ---------------------------------------------------------------------
     const spawn = (band: (typeof BANDS)[number], seeded: boolean): Star => {
       const angle = Math.random() * Math.PI * 2;
-      // Start close to the centre; radius grows with depth as it approaches.
-      const radius = seeded ? Math.random() : Math.random() * 0.12;
 
       return {
-        x: Math.cos(angle) * radius * (width / 2),
-        // Scaled by the same factor used for the vanishing point, so seeded
-        // stars fill the frame evenly rather than clustering.
-        y: Math.sin(angle) * radius * (height / 2),
-        depth: seeded ? Math.random() : 0,
-        speed: band.speed * (0.75 + Math.random() * 0.5),
+        dirX: Math.cos(angle),
+        dirY: Math.sin(angle),
+        // Seeded stars are spread across the whole radius so the field looks
+        // established on the first frame; respawns start at the vanishing point.
+        // sqrt() spreads them by area rather than clustering them centrally.
+        r: seeded ? Math.sqrt(Math.random()) : Math.random() * 0.04,
+        speed: NEAR_SPEED * band.speedMul * (0.8 + Math.random() * 0.4),
         size: band.size[0] + Math.random() * (band.size[1] - band.size[0]),
         alpha: band.alpha[0] + Math.random() * (band.alpha[1] - band.alpha[0]),
+        trail: band.trail,
         hue: STAR_COLOURS[Math.floor(Math.random() * STAR_COLOURS.length)],
       };
     };
@@ -138,38 +159,54 @@ export default function Starfield() {
     const cx = () => width / 2;
     const cy = () => height * CENTRE_Y;
 
-    const draw = (deltaScale: number) => {
+    const draw = (dtSeconds: number) => {
       ctx.clearRect(0, 0, width, height);
+
+      // Radius that takes a star from the vanishing point to the far corner.
+      const reach = Math.hypot(Math.max(cx(), width - cx()), Math.max(cy(), height - cy()));
 
       for (let i = 0; i < stars.length; i++) {
         const star = stars[i];
 
-        // Accelerate outward: the further along, the faster it moves, which
-        // reads as approaching the viewer.
-        star.depth += star.speed * deltaScale * (0.35 + star.depth);
+        // Accelerate outward: the closer to the viewer, the faster it travels.
+        star.r += star.speed * dtSeconds * (ACCEL_BASE + star.r);
 
-        if (star.depth >= 1) {
+        if (star.r >= 1) {
           stars[i] = spawn(bandFor(i), false);
           continue;
         }
 
-        // Ease the outward travel so motion is gentle near the centre.
-        const travel = star.depth * star.depth;
-        const px = cx() + star.x * (1 + travel * 6);
-        const py = cy() + star.y * (1 + travel * 6);
+        const dist = star.r * reach;
+        const px = cx() + star.dirX * dist;
+        const py = cy() + star.dirY * dist;
 
-        // Cull once outside the box, and recycle immediately.
-        if (px < -20 || px > width + 20 || py < -20 || py > height + 20) {
+        // Recycle once clear of the frame rather than drawing offscreen.
+        if (px < -30 || px > width + 30 || py < -30 || py > height + 30) {
           stars[i] = spawn(bandFor(i), false);
           continue;
         }
 
-        // Fade in from the centre and out at the edges so nothing pops.
-        const fade = Math.sin(Math.min(1, star.depth) * Math.PI);
+        // Fade in from the vanishing point and out at the edge so nothing pops.
+        const fade = Math.sin(star.r * Math.PI);
+        const size = star.size * (0.55 + star.r * 1.1);
+        const colour = `rgb(${star.hue})`;
+
+        // Trail first, so the dot sits on top of its own streak. Length scales
+        // with r, so a star only streaks once it is genuinely moving quickly.
+        if (star.trail > 0 && star.r > 0.12) {
+          ctx.globalAlpha = star.alpha * fade * TRAIL_ALPHA;
+          ctx.strokeStyle = colour;
+          ctx.lineWidth = size * 0.9;
+          ctx.lineCap = "round";
+          const len = star.trail * star.r;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(px - star.dirX * len, py - star.dirY * len);
+          ctx.stroke();
+        }
+
         ctx.globalAlpha = star.alpha * fade;
-        ctx.fillStyle = `rgb(${star.hue})`;
-
-        const size = star.size * (0.6 + travel * 2.2);
+        ctx.fillStyle = colour;
         ctx.beginPath();
         ctx.arc(px, py, size, 0, Math.PI * 2);
         ctx.fill();
@@ -193,9 +230,10 @@ export default function Starfield() {
       if (elapsed < FRAME_MS) return;
       last = now;
 
-      // Normalise against the target frame so speed is independent of the
-      // actual cadence, and clamp so a long pause cannot jump the field.
-      draw(Math.min(elapsed / FRAME_MS, 3));
+      // Real elapsed seconds, so velocity is independent of frame cadence and
+      // the calibrated crossing time holds. Clamped so that returning from a
+      // paused tab cannot teleport the whole field.
+      draw(Math.min(elapsed, FRAME_MS * 3) / 1000);
     };
 
     const start = () => {

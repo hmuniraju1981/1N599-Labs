@@ -61,7 +61,12 @@ export default function SpaceScene({ children }: { children: React.ReactNode }) 
       {/* ------------------------------------------- LAYER 1 — the photograph */}
       {/* Inset negatively so the scale and drift can never expose an edge:
           12% larger than the box gives 6% of bleed on every side. */}
-      <div className="absolute -inset-[6%] z-0">
+      {/* The outer element pans (43s), the inner scales (32s). Two elements
+          because one cannot animate `transform` on two independent clocks.
+          -6% inset plus the 1.28 scale leaves ample bleed: the scaled image
+          extends ~15% of the container past each edge, against a maximum 3%
+          pan, so no edge can ever be exposed. */}
+      <div className="hero-kenburns-pan absolute -inset-[6%] z-0">
         <div
           className="hero-kenburns absolute inset-0 bg-cover bg-center"
           style={{

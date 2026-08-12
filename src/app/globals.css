@@ -79,9 +79,23 @@ body {
    up pushed LCP to 7.8s; starting at maximum size and easing down fixes it.
    With animation-direction: alternate the motion is identical in feel, just
    phase-shifted. */
+/* Scale only. Pan lives on a separate element (.hero-kenburns-pan) so the two
+   can run on different periods — a single element cannot animate transform on
+   two independent clocks. 1 -> 1.28 over 32s is ~0.9% per second, roughly 7x
+   the previous 1 -> 1.12 over 90s, which was below the perceptual threshold. */
 @keyframes hero-kenburns {
-  from { transform: scale(1.12) translate3d(-2.4%, -1.8%, 0); }
-  to   { transform: scale(1) translate3d(0, 0, 0); }
+  from { transform: scale(1); }
+  to   { transform: scale(1.28); }
+}
+
+/* Lateral drift, deliberately on a 43s period against the scale's 32s so the
+   combined path never resolves into a straight line or an obvious loop. The
+   asymmetric midpoints keep X and Y out of phase with each other too. */
+@keyframes hero-kenburns-pan {
+  0%   { transform: translate3d(-3%, 1%, 0); }
+  33%  { transform: translate3d(1.5%, -2%, 0); }
+  66%  { transform: translate3d(3%, 1.6%, 0); }
+  100% { transform: translate3d(-3%, 1%, 0); }
 }
 
 /* Gradient shift: moves a 200% background-size gradient left to right and back */
@@ -115,11 +129,19 @@ body {
      this animating layer, so the animation forced the text to repaint and LCP was
      registered late. Controlled A/B with the animation as the only variable:
      724ms with it running versus 184ms without. Letting first paint complete
-     before motion starts removes the interaction. Invisible on a 90s loop. */
-  animation: hero-kenburns 90s ease-in-out 1.5s infinite alternate;
+     before motion starts removes the interaction. */
+  animation: hero-kenburns 32s ease-in-out 1.5s infinite alternate;
   transform-origin: 50% 45%;
   will-change: transform;
   backface-visibility: hidden; /* avoids sub-pixel shimmer while scaling */
+}
+
+/* Pan layer. Linear rather than ease-in-out: the scale already provides the
+   easing, and easing both made the whole frame stall at the turnarounds. */
+.hero-kenburns-pan {
+  animation: hero-kenburns-pan 43s linear 1.5s infinite;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 /* Isolates the hero text from the animating background above, so repaints of
@@ -138,7 +160,8 @@ body {
    image: no Ken Burns here, and Hero does not mount the starfield canvas at all.
    ============================================================================= */
 @media (prefers-reduced-motion: reduce) {
-  .hero-kenburns {
+  .hero-kenburns,
+  .hero-kenburns-pan {
     animation: none;
     transform: none;
   }
