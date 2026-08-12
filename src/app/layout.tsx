@@ -96,6 +96,16 @@ export default function RootLayout({
           - flex flex-col: allows children to use flex-grow for full-height layouts
           - bg/text colors: fallback dark theme colors (matches CSS custom props) */}
       <body className="min-h-full flex flex-col bg-[#030712] text-[#f1f5f9]">
+        {/* The hero photograph is the Largest Contentful Paint element, but it is
+            a CSS background, so the browser cannot discover it until stylesheets
+            have parsed. Preloading it removes that delay. React hoists this into
+            <head>. */}
+        <link
+          rel="preload"
+          as="image"
+          href="/images/domains.jpg"
+          fetchPriority="high"
+        />
         <ScrollToTop /> {/* Forces every visit to start at the top of the page */}
         {children} {/* Current page content renders here */}
       </body>

@@ -69,6 +69,21 @@ body {
   50% { opacity: 1; }                         /* Bright at midpoint */
 }
 
+/* Hero Ken Burns: a very slow push-in with a slight diagonal drift, giving the
+   sense of travelling forward through space. Transform only, so the browser can
+   composite it on the GPU — never top/left, which would trigger layout. */
+/* NOTE ON DIRECTION: this deliberately starts at the LARGER scale and eases
+   down, rather than 1 -> 1.12. The hero image is the Largest Contentful Paint
+   element, and LCP re-reports whenever a bigger contentful paint occurs — so an
+   element that grows for 90s keeps invalidating its own LCP. Measured: scaling
+   up pushed LCP to 7.8s; starting at maximum size and easing down fixes it.
+   With animation-direction: alternate the motion is identical in feel, just
+   phase-shifted. */
+@keyframes hero-kenburns {
+  from { transform: scale(1.12) translate3d(-2.4%, -1.8%, 0); }
+  to   { transform: scale(1) translate3d(0, 0, 0); }
+}
+
 /* Gradient shift: moves a 200% background-size gradient left to right and back */
 @keyframes gradient-shift {
   0% { background-position: 0% 50%; }        /* Start: gradient aligned left */
@@ -89,6 +104,35 @@ body {
 /* Applies the pulse glow opacity animation — 3 second cycle, infinite loop */
 .animate-pulse-glow {
   animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Hero background traversal (LAYER 1).
+   'alternate' means it eases back out instead of snapping to the start, so the
+   90s push has no visible cut. 180s for a full there-and-back cycle. */
+.hero-kenburns {
+  animation: hero-kenburns 90s ease-in-out infinite alternate;
+  transform-origin: 50% 45%;
+  will-change: transform;
+  backface-visibility: hidden; /* avoids sub-pixel shimmer while scaling */
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   Anyone who has asked their OS for less motion gets the brightened static
+   image: no Ken Burns here, and Hero does not mount the starfield canvas at all.
+   ============================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .hero-kenburns {
+    animation: none;
+    transform: none;
+  }
+
+  /* The ambient blur glows also pulse; hold them still. */
+  .animate-pulse,
+  .animate-pulse-glow,
+  .animate-float {
+    animation: none;
+  }
 }
 
 /* =============================================================================
