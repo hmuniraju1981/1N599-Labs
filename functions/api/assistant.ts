@@ -24,6 +24,14 @@ import { buildSystemPrompt } from "../../content/knowledge";
 interface Env {
   GROQ_API_KEY: string; // Encrypted secret. Server-side only.
   GROQ_MODEL?: string; // Plaintext var. Falls back to DEFAULT_MODEL below.
+  RATE_LIMIT?: KVNamespace; // KV namespace backing the IP rate limiter.
+}
+
+// Minimal shape of the KV binding we rely on, declared locally so this file
+// does not need the full @cloudflare/workers-types package.
+interface KVNamespace {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
 }
 
 // Chosen because it is on Groq's current *Production* model list (verified at
@@ -42,38 +50,54 @@ const RATE_LIMIT_MAX = 20; // Messages allowed per window, per IP
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
 // -----------------------------------------------------------------------------
-// Best-effort in-memory IP rate limiter.
-// NOTE: module scope lives as long as the isolate, so this is per-isolate rather
-// than globally consistent. It reliably stops a single abusive client hammering
-// the endpoint, which is the threat here. If this ever needs to be strict
-// across all edge locations, swap the Map for a KV namespace or Durable Object —
-// the read/increment shape below is deliberately easy to port.
+// KV-backed IP rate limiter.
+//
+// WHY KV AND NOT MODULE STATE: an in-memory Map only lives as long as one V8
+// isolate. Locally that is a single long-lived isolate so a Map appears to work,
+// but on the real edge requests are spread across isolates that are constantly
+// created and recycled, so counts never accumulate and the limit never trips.
+// This was measured: 22 consecutive edge requests produced zero 429s, where the
+// same test locally tripped on request 21 exactly. KV is shared across isolates.
+//
+// KV is eventually consistent, on the order of seconds. Against a 600-second
+// window that is comfortably accurate enough for abuse control.
+//
+// FAILURE MODE: fails OPEN. If KV is unavailable the assistant keeps answering
+// rather than going dark, and a Cloudflare WAF rate-limiting rule on this route
+// is the backstop that protects API spend. A KV blip should not break the site.
 // -----------------------------------------------------------------------------
-const hits = new Map<string, number[]>();
+async function isRateLimited(ip: string, store?: KVNamespace): Promise<boolean> {
+  // No binding configured (e.g. local dev without --kv): skip, do not block.
+  if (!store) return false;
 
-function isRateLimited(ip: string): boolean {
+  const key = `rl:${ip}`;
   const now = Date.now();
   const cutoff = now - RATE_LIMIT_WINDOW_MS;
 
-  // Drop timestamps that have aged out of the window.
-  const recent = (hits.get(ip) ?? []).filter((t) => t > cutoff);
+  try {
+    const raw = await store.get(key);
 
-  if (recent.length >= RATE_LIMIT_MAX) {
-    hits.set(ip, recent);
-    return true;
+    // Stored as a JSON array of epoch-ms timestamps.
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    const timestamps = Array.isArray(parsed)
+      ? parsed.filter((t): t is number => typeof t === "number" && t > cutoff)
+      : [];
+
+    if (timestamps.length >= RATE_LIMIT_MAX) return true;
+
+    timestamps.push(now);
+
+    // expirationTtl lets KV evict the key once the window has fully elapsed,
+    // so the namespace self-cleans and needs no sweeping.
+    await store.put(key, JSON.stringify(timestamps), {
+      expirationTtl: Math.ceil(RATE_LIMIT_WINDOW_MS / 1000),
+    });
+
+    return false;
+  } catch (err) {
+    console.error("Rate limiter KV error, failing open:", err);
+    return false;
   }
-
-  recent.push(now);
-  hits.set(ip, recent);
-
-  // Opportunistic cleanup so the Map cannot grow without bound.
-  if (hits.size > 5000) {
-    for (const [key, times] of hits) {
-      if (times.every((t) => t <= cutoff)) hits.delete(key);
-    }
-  }
-
-  return false;
 }
 
 // -----------------------------------------------------------------------------
@@ -191,8 +215,10 @@ export const onRequestPost = async (context: {
     return json({ error: "Forbidden." }, 403);
   }
 
+  // CF-Connecting-IP is set by Cloudflare itself on the edge and cannot be
+  // spoofed by the client, so it is safe to key the limiter on.
   const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
-  if (isRateLimited(ip)) {
+  if (await isRateLimited(ip, env.RATE_LIMIT)) {
     return json({ error: "rate_limited" }, 429);
   }
 

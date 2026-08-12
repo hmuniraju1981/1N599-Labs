@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "preview": "npm run build && wrangler pages dev out",
+    "preview": "npm run build && wrangler pages dev out --kv RATE_LIMIT",
     "deploy": "npm run build && wrangler pages deploy out --project-name=1n599-inc"
   },
   "dependencies": {
