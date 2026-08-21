@@ -130,10 +130,12 @@ export default function AcceptableUsePolicy() {
 
       <Clause id="fair-use" number={3} title="Fair use and rate limits">
         <P>
-          We apply automated rate limits to protect the service and our costs. At
-          present the AI assistant permits 20 messages per 10 minutes and the
-          contact form 5 submissions per hour, measured per network address. These
-          figures are generous for genuine use and may change without notice.
+          We apply automated rate limits to protect the service and our costs,
+          measured per network address. At present the AI assistant permits 20
+          messages per 10 minutes. The contact form permits 5 delivered messages
+          per hour, plus a wider ceiling on total attempts so that correcting a
+          mistyped address never counts against you. These figures are generous
+          for genuine use and may change without notice.
         </P>
         <P>
           If you hit a limit you will be told so and asked to wait. Deliberately

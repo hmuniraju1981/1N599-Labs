@@ -109,42 +109,90 @@ export function rateLimitKey(ip: string): string {
 // assistant allows far more requests than the contact form should, and sharing
 // one key would let chat traffic exhaust the form's allowance.
 // -----------------------------------------------------------------------------
+// `record` controls whether a permitted request also consumes quota.
+//
+// It defaults to true, which is right when every request costs something no
+// matter the outcome — the assistant pays for an LLM call whatever the visitor
+// typed. It must be false where the expensive action happens later and might not
+// happen at all: counting a rejected contact-form submission meant someone who
+// mistyped their email address five times was locked out for an hour, having
+// never successfully sent anything. Callers that pass false are responsible for
+// calling recordRateLimitHit() once the costly action actually succeeds.
 export async function isRateLimited(
   ip: string,
   store: KVNamespace | undefined,
-  options: { bucket: string; max: number; windowMs: number },
+  options: { bucket: string; max: number; windowMs: number; record?: boolean },
 ): Promise<boolean> {
   // No binding configured (e.g. local dev without --kv): skip, do not block.
   if (!store) return false;
 
   const key = `rl:${options.bucket}:${rateLimitKey(ip)}`;
   const now = Date.now();
-  const cutoff = now - options.windowMs;
 
   try {
-    const raw = await store.get(key);
-
-    // Stored as a JSON array of epoch-ms timestamps.
-    const parsed: unknown = raw ? JSON.parse(raw) : [];
-    const timestamps = Array.isArray(parsed)
-      ? parsed.filter((t): t is number => typeof t === "number" && t > cutoff)
-      : [];
+    const timestamps = await readWindow(store, key, now - options.windowMs);
 
     if (timestamps.length >= options.max) return true;
 
-    timestamps.push(now);
-
-    // expirationTtl lets KV evict the key once the window has fully elapsed, so
-    // the namespace self-cleans and needs no sweeping.
-    await store.put(key, JSON.stringify(timestamps), {
-      expirationTtl: Math.ceil(options.windowMs / 1000),
-    });
+    if (options.record ?? true) {
+      await writeWindow(store, key, [...timestamps, now], options.windowMs);
+    }
 
     return false;
   } catch (err) {
     console.error("Rate limiter KV error, failing open:", err);
     return false;
   }
+}
+
+// Consumes one unit of quota. Used after a costly action has succeeded, paired
+// with an isRateLimited({ record: false }) check earlier in the request.
+export async function recordRateLimitHit(
+  ip: string,
+  store: KVNamespace | undefined,
+  options: { bucket: string; windowMs: number },
+): Promise<void> {
+  if (!store) return;
+
+  const key = `rl:${options.bucket}:${rateLimitKey(ip)}`;
+  const now = Date.now();
+
+  try {
+    const timestamps = await readWindow(store, key, now - options.windowMs);
+    await writeWindow(store, key, [...timestamps, now], options.windowMs);
+  } catch (err) {
+    // Failing to record is a lost count, not a reason to fail the request the
+    // visitor already completed successfully.
+    console.error("Rate limiter KV write error, ignoring:", err);
+  }
+}
+
+// Reads the stored timestamps, discarding anything outside the window. Stored as
+// a JSON array of epoch-ms values.
+async function readWindow(
+  store: KVNamespace,
+  key: string,
+  cutoff: number,
+): Promise<number[]> {
+  const raw = await store.get(key);
+  const parsed: unknown = raw ? JSON.parse(raw) : [];
+
+  return Array.isArray(parsed)
+    ? parsed.filter((t): t is number => typeof t === "number" && t > cutoff)
+    : [];
+}
+
+// expirationTtl lets KV evict the key once the window has fully elapsed, so the
+// namespace self-cleans and needs no sweeping.
+function writeWindow(
+  store: KVNamespace,
+  key: string,
+  timestamps: number[],
+  windowMs: number,
+): Promise<void> {
+  return store.put(key, JSON.stringify(timestamps), {
+    expirationTtl: Math.ceil(windowMs / 1000),
+  });
 }
 
 // Cloudflare sets CF-Connecting-IP on the edge and it cannot be spoofed by the

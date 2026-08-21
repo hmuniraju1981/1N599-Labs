@@ -175,6 +175,33 @@ body {
 }
 
 /* =============================================================================
+   AUTOFILL
+   Browsers force their own background and text colour onto autofilled inputs.
+   On this dark theme that repainted the Name and Email fields near-white while
+   the Message field stayed dark, so a partly autofilled form looked broken.
+
+   background-color cannot be overridden on an autofilled control at all, which
+   is why this uses a huge inset box-shadow to paint over it instead — the
+   long-standing workaround for exactly this restriction. -webkit-text-fill-color
+   is likewise needed because plain `color` is also ignored here.
+
+   The absurd transition delay is the other half of the trick: WebKit applies its
+   yellow background via a transition, and parking that transition ~317 years out
+   means it never visibly arrives.
+   ============================================================================= */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;          /* `color` is ignored when autofilled */
+  -webkit-box-shadow: 0 0 0 1000px rgba(2, 6, 23, 0.92) inset; /* fakes bg: slate-950 */
+  caret-color: #ffffff;                      /* keeps the cursor visible on dark */
+  transition: background-color 9999s ease-out 0s;
+}
+
+/* =============================================================================
    GRADIENT TEXT EFFECT
    Makes text display a moving gradient color (cyan → violet → pink).
    The background-clip technique clips a gradient to the text shape.

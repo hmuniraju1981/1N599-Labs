@@ -28,6 +28,7 @@ import {
   isRateLimited,
   isSameOrigin,
   json,
+  recordRateLimitHit,
   type KVNamespace,
 } from "../../server/edge";
 
@@ -43,20 +44,30 @@ interface Env {
   RATE_LIMIT?: KVNamespace; // Shared KV namespace backing the IP rate limiter.
 }
 
-// -----------------------------------------------------------------------------
-// Guardrails
-//
-// The limit is deliberately far tighter than the assistant's. A human with
-// something to say sends one message, maybe two if they mistyped their address.
-// Anything past five in an hour from one address is a script, and every one of
-// these costs a real email delivery against the account's sending quota.
-// -----------------------------------------------------------------------------
 const MAX_NAME = 120;
 const MAX_EMAIL = 254; // RFC 5321 maximum length of a forward-path.
 const MAX_MESSAGE = 4000;
 const MIN_MESSAGE = 10; // Below this it is a test or a mash of the keyboard.
-const RATE_LIMIT_MAX = 5;
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+// -----------------------------------------------------------------------------
+// Two-tier rate limiting, because the two things worth protecting are different.
+//
+// SENDS is the tight one: each delivered email costs real sending quota, and a
+// human with something to say sends one message, maybe two. It is charged ONLY
+// when an email actually goes out.
+//
+// ATTEMPTS is the loose one: it stops someone hammering the endpoint, and is
+// charged on every request.
+//
+// The original single limit charged every request against the tight ceiling,
+// which meant five typos locked a genuine visitor out for an hour without a
+// single message having been sent. That is a worse failure than a little extra
+// spam, because the person it turns away is the one you wanted to hear from.
+// -----------------------------------------------------------------------------
+const SEND_LIMIT_MAX = 5;
+const SEND_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const ATTEMPT_LIMIT_MAX = 40;
+const ATTEMPT_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
 interface Submission {
   name: string;
@@ -113,12 +124,27 @@ export const onRequestPost = async (context: {
     return json({ error: "forbidden" }, 403);
   }
 
-  const limited = await isRateLimited(clientIp(request), env.RATE_LIMIT, {
-    bucket: "contact",
-    max: RATE_LIMIT_MAX,
-    windowMs: RATE_LIMIT_WINDOW_MS,
+  const ip = clientIp(request);
+
+  // Cheap guard against hammering. Charged on every request.
+  const hammering = await isRateLimited(ip, env.RATE_LIMIT, {
+    bucket: "contact-attempt",
+    max: ATTEMPT_LIMIT_MAX,
+    windowMs: ATTEMPT_LIMIT_WINDOW_MS,
   });
-  if (limited) {
+  if (hammering) {
+    return json({ error: "rate_limited" }, 429);
+  }
+
+  // Send quota. Checked here so we reject before doing any work, but NOT charged
+  // until an email actually goes out further down.
+  const sendQuotaReached = await isRateLimited(ip, env.RATE_LIMIT, {
+    bucket: "contact-send",
+    max: SEND_LIMIT_MAX,
+    windowMs: SEND_LIMIT_WINDOW_MS,
+    record: false,
+  });
+  if (sendQuotaReached) {
     return json({ error: "rate_limited" }, 429);
   }
 
@@ -166,6 +192,14 @@ export const onRequestPost = async (context: {
     console.error("Email worker rejected the send", upstream.status, detail);
     return json({ error: "send_failed" }, 502);
   }
+
+  // An email went out, so now charge the send quota. Deliberately after the send
+  // rather than before: a visitor whose message failed to send has not consumed
+  // anything and should not be penalised for our failure.
+  await recordRateLimitHit(ip, env.RATE_LIMIT, {
+    bucket: "contact-send",
+    windowMs: SEND_LIMIT_WINDOW_MS,
+  });
 
   return json({ ok: true }, 200);
 };
