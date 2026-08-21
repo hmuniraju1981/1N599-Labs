@@ -108,7 +108,11 @@ export const NEVER_CLAIM = [
 ] as const;
 
 // -----------------------------------------------------------------------------
-// SUGGESTED PROMPTS (the chips shown in the empty state)
+// SUGGESTED PROMPTS
+//
+// Shown as chips in the empty state AND again under each completed reply, minus
+// any the visitor has already asked. Ordered roughly from broadest to most
+// specific, since the list is offered top-to-bottom on a narrow screen.
 // -----------------------------------------------------------------------------
 export const SUGGESTED_PROMPTS = [
   "What does 1N599 build?",
@@ -129,6 +133,10 @@ export const ASSISTANT_UI = {
   subtitle:
     "Powered by AI — ask about our products, platform, or what's coming next",
   emptyState: "Try asking a question below",
+  // Heading above the chips that reappear after each reply. Deliberately not
+  // "Suggested questions": these are things the assistant can actually answer
+  // well, and the shorter label reads as a nudge rather than a form label.
+  followUpLabel: "Try asking",
   placeholder: "Ask about our products, platform, or roadmap...",
   errorMessage: "Something went wrong reaching the assistant.",
   rateLimitMessage:

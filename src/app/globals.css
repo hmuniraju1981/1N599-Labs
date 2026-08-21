@@ -232,6 +232,28 @@ body {
   mask-composite: exclude;                 /* Standard property for mask compositing */
   opacity: 0;                              /* Hidden by default */
   transition: opacity 0.4s ease;           /* Smooth fade-in on hover */
+
+  /* CRITICAL — do not remove. This overlay covers the whole card, and without it
+     the card's contents cannot be clicked, focused or typed into.
+
+     Two CSS facts combine to cause that:
+       1. This pseudo-element is absolutely positioned, so it paints in the
+          "positioned descendants" step of the painting order, which is ABOVE
+          in-flow non-positioned content (CSS 2.1 Appendix E). The inputs inside
+          a .glow-card are statically positioned, so this paints on top of them.
+       2. opacity: 0 does NOT stop an element receiving pointer events. It is
+          still hit-tested, unlike visibility: hidden or display: none.
+
+     So this invisible 1px-inset overlay was silently eating every click and
+     focus attempt across the entire card. That is why the contact form appeared
+     permanently disabled — the fields were fine, but nothing could reach them.
+     The AI assistant's input was unaffected only because that card is styled
+     with inline styles rather than .glow-card.
+
+     Hover still works: :hover is matched on .glow-card itself, not on this
+     pseudo-element, so making it transparent to pointer events does not affect
+     the gradient-border reveal. */
+  pointer-events: none;
 }
 
 /* Show the gradient border when card is hovered */

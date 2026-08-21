@@ -29,6 +29,29 @@ interface Message {
 
 const MAX_INPUT_CHARS = 1200; // Kept in sync with the server-side cap.
 
+// -----------------------------------------------------------------------------
+// A suggestion chip. Extracted because these are rendered in two places now —
+// the empty state and after each completed reply — and the styling was long
+// enough that a second inline copy would have drifted from the first.
+// -----------------------------------------------------------------------------
+function PromptChip({
+  prompt,
+  onSelect,
+}: {
+  prompt: string;
+  onSelect: (prompt: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(prompt)}
+      className="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white/[0.07] border border-white/[0.12] backdrop-blur-sm text-[11.5px] sm:text-[13px] text-slate-200 hover:border-cyan-400/70 hover:text-cyan-200 hover:bg-white/[0.11] transition-colors duration-200"
+    >
+      {prompt}
+    </button>
+  );
+}
+
 export default function AiAssistant() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -41,6 +64,38 @@ export default function AiAssistant() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const hasConversation = messages.length > 0;
+
+  // ---------------------------------------------------------------------------
+  // Follow-up suggestions.
+  //
+  // The chips used to live only in the empty state, so they disappeared the
+  // moment the first question was sent and never came back. That left the
+  // visitor staring at a bare text box with no idea what else could be asked,
+  // which is the point at which most people stop using an assistant.
+  //
+  // Prompts already asked are filtered out — re-offering a question that is
+  // sitting a few lines above in the transcript is noise, and clicking it would
+  // just produce the same answer again.
+  // ---------------------------------------------------------------------------
+  const askedPrompts = new Set(
+    messages.filter((message) => message.role === "user").map((m) => m.content),
+  );
+  const remainingPrompts = SUGGESTED_PROMPTS.filter(
+    (prompt) => !askedPrompts.has(prompt),
+  );
+
+  const lastMessage = messages[messages.length - 1];
+
+  // Only once a reply is genuinely complete: not mid-stream, not errored, and
+  // with actual content — otherwise the chips flash in beside a half-written
+  // answer or an empty bubble.
+  const showFollowUpPrompts =
+    hasConversation &&
+    !isStreaming &&
+    !error &&
+    lastMessage?.role === "assistant" &&
+    lastMessage.content.trim() !== "" &&
+    remainingPrompts.length > 0;
 
   // ---------------------------------------------------------------------------
   // Keep the newest content in view WITHOUT touching page scroll.
@@ -197,14 +252,7 @@ export default function AiAssistant() {
 
               <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
                 {SUGGESTED_PROMPTS.map((prompt) => (
-                  <button
-                    key={prompt}
-                    type="button"
-                    onClick={() => submit(prompt)}
-                    className="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white/[0.07] border border-white/[0.12] backdrop-blur-sm text-[11.5px] sm:text-[13px] text-slate-200 hover:border-cyan-400/70 hover:text-cyan-200 hover:bg-white/[0.11] transition-colors duration-200"
-                  >
-                    {prompt}
-                  </button>
+                  <PromptChip key={prompt} prompt={prompt} onSelect={submit} />
                 ))}
               </div>
             </div>
@@ -247,6 +295,22 @@ export default function AiAssistant() {
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" />
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.15s]" />
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.3s]" />
+                  </div>
+                </div>
+              )}
+
+              {/* ------------------------------------- FOLLOW-UP SUGGESTIONS */}
+              {/* Left-aligned to sit under the assistant's bubble, so they read
+                  as "here is what to ask next" rather than as a second reply. */}
+              {showFollowUpPrompts && (
+                <div className="pt-1">
+                  <p className="text-[10.5px] uppercase tracking-wider text-slate-500 mb-2">
+                    {ASSISTANT_UI.followUpLabel}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    {remainingPrompts.map((prompt) => (
+                      <PromptChip key={prompt} prompt={prompt} onSelect={submit} />
+                    ))}
                   </div>
                 </div>
               )}
