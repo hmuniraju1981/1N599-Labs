@@ -6,6 +6,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import Logo from "./Logo";
@@ -17,10 +18,11 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        {/* Logo */}
-        <a href="#" className="z-50">
+        {/* Logo — "/" not "#", so it returns to the homepage from a policy page
+            rather than being a no-op link to the current URL. */}
+        <Link href="/" className="z-50" aria-label="1N599 Inc — home">
           <Logo size={36} showText={true} />
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
