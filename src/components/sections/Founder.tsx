@@ -11,13 +11,26 @@ import { COMPANY } from "@/lib/constants";
 export default function Founder() {
   return (
     <section id="contact" className="py-32 px-6 relative overflow-hidden">
-      {/* Team discussion background — bright and vibrant */}
-      <div className="absolute inset-0 bg-cover bg-center opacity-[0.5]" style={{ backgroundImage: 'url(/images/team.jpg)' }} />
-      <div className="absolute inset-0 bg-[#030712]/45" />
+      {/* Team discussion background — bright and vibrant.
+          All of these layers are decorative, so they are marked aria-hidden and
+          pointer-events-none. The latter matters: they are absolutely positioned
+          over the full section, and without it any future z-index change could
+          silently put one of them in front of the form and swallow its clicks. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.5]"
+        style={{ backgroundImage: 'url(/images/team.jpg)' }}
+      />
+      {/* Scrim over the photograph. Raised from /45 to /70: at /45 the bright,
+          high-detail photo showed through strongly enough that the form fields
+          and their placeholder text lost contrast against it, which is what made
+          the section look washed out and disabled. The photo is still clearly
+          visible — it just no longer competes with the controls on top of it. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[#030712]/70" />
       {/* Glowing light effects */}
-      <div className="absolute top-[15%] right-[20%] w-80 h-72 bg-cyan-400/25 rounded-full blur-[90px] animate-pulse" />
-      <div className="absolute bottom-[20%] left-[10%] w-72 h-80 bg-violet-400/25 rounded-full blur-[90px] animate-pulse [animation-delay:1s]" />
-      <div className="absolute top-[50%] left-[60%] w-64 h-64 bg-amber-300/15 rounded-full blur-[80px] animate-pulse [animation-delay:1.8s]" />
+      <div aria-hidden="true" className="pointer-events-none absolute top-[15%] right-[20%] w-80 h-72 bg-cyan-400/25 rounded-full blur-[90px] animate-pulse" />
+      <div aria-hidden="true" className="pointer-events-none absolute bottom-[20%] left-[10%] w-72 h-80 bg-violet-400/25 rounded-full blur-[90px] animate-pulse [animation-delay:1s]" />
+      <div aria-hidden="true" className="pointer-events-none absolute top-[50%] left-[60%] w-64 h-64 bg-amber-300/15 rounded-full blur-[80px] animate-pulse [animation-delay:1.8s]" />
       <div className="relative max-w-6xl mx-auto">
 
         {/* Section heading */}
@@ -53,7 +66,7 @@ export default function Founder() {
                 </div>
                 <div>
                   <p className="text-slate-300 font-medium">Location</p>
-                  <p className="text-slate-400" style={{ whiteSpace: "pre-line" }}>{COMPANY.address.full}</p>
+                  <p className="text-slate-200" style={{ whiteSpace: "pre-line" }}>{COMPANY.address.full}</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -66,7 +79,7 @@ export default function Founder() {
                       way to copy it reliably on a phone. */}
                   <a
                     href={`mailto:${COMPANY.email}`}
-                    className="text-slate-400 hover:text-cyan-400 underline underline-offset-2 decoration-slate-600 hover:decoration-cyan-400 transition-colors break-all"
+                    className="text-slate-200 hover:text-cyan-400 underline underline-offset-2 decoration-slate-500 hover:decoration-cyan-400 transition-colors break-all"
                   >
                     {COMPANY.email}
                   </a>
@@ -80,7 +93,7 @@ export default function Founder() {
                   <p className="text-slate-300 font-medium">Website</p>
                   <a
                     href={`https://${COMPANY.domain}`}
-                    className="text-slate-400 hover:text-cyan-400 underline underline-offset-2 decoration-slate-600 hover:decoration-cyan-400 transition-colors break-all"
+                    className="text-slate-200 hover:text-cyan-400 underline underline-offset-2 decoration-slate-500 hover:decoration-cyan-400 transition-colors break-all"
                   >
                     www.{COMPANY.domain}
                   </a>

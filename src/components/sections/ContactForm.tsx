@@ -165,8 +165,24 @@ export default function ContactForm() {
     );
   }
 
+  // -------------------------------------------------------------- FIELD STYLE
+  // These fields sit on a translucent "glass" card over a bright, busy
+  // photograph. The original styling (bg-white/5, border-white/10,
+  // placeholder:text-slate-500) let all of that show through, so the inputs had
+  // almost no edge and the placeholder text came out dim grey — the whole block
+  // read as disabled, and was reported as "greyed out, can't send".
+  //
+  // Fixed by giving each field its own near-opaque dark backing instead of
+  // relying on a 5%-white tint: the field now defines its own contrast rather
+  // than inheriting whatever pixels happen to be behind it. Placeholder lifted
+  // to slate-400 and the value text to white, so a filled field is clearly
+  // distinguishable from an empty one.
+  //
+  // disabled: styling is kept, but now it looks meaningfully different from the
+  // enabled state — previously the two were nearly identical, which is what made
+  // the enabled form look broken.
   const inputClasses =
-    "w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed";
+    "w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-white/20 text-white placeholder:text-slate-400 shadow-inner shadow-black/20 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40 hover:border-white/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-white/20";
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit} noValidate>
@@ -293,11 +309,11 @@ export default function ContactForm() {
         )}
       </button>
 
-      <p className="text-xs text-slate-400 text-center">
+      <p className="text-xs text-slate-300 text-center">
         We use your message only to reply to you. See our{" "}
         <a
           href="/privacy"
-          className="text-slate-300 underline underline-offset-2 hover:text-cyan-400 transition-colors"
+          className="text-slate-100 underline underline-offset-2 hover:text-cyan-400 transition-colors"
         >
           Privacy Policy
         </a>
