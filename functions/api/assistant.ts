@@ -17,27 +17,82 @@
 // =============================================================================
 
 import { buildSystemPrompt } from "../../content/knowledge";
+import {
+  clientIp,
+  isRateLimited,
+  isSameOrigin,
+  json,
+  type KVNamespace,
+} from "../../server/edge";
 
 // -----------------------------------------------------------------------------
 // Runtime bindings supplied by Cloudflare Pages (Settings → Variables & secrets)
 // -----------------------------------------------------------------------------
 interface Env {
   GROQ_API_KEY: string; // Encrypted secret. Server-side only.
-  GROQ_MODEL?: string; // Plaintext var. Falls back to DEFAULT_MODEL below.
+  GROQ_MODEL?: string; // Optional plaintext override; see modelCandidates below.
   RATE_LIMIT?: KVNamespace; // KV namespace backing the IP rate limiter.
 }
 
-// Minimal shape of the KV binding we rely on, declared locally so this file
-// does not need the full @cloudflare/workers-types package.
-interface KVNamespace {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
+// -----------------------------------------------------------------------------
+// Model selection, in preference order.
+//
+// WHY A CHAIN AND NOT A SINGLE ID: this site went dark once already because it
+// pinned `llama-3.3-70b-versatile`, which Groq shut down on 2026-08-16. Every
+// request then failed with a 404 and the assistant showed "Something went wrong"
+// to every visitor. A hardcoded single model makes a provider deprecation an
+// outage, and deprecations are routine and pre-announced by email that nobody
+// reads. So we carry an ordered list and fall through it.
+//
+// Only *model availability* failures advance the chain (see isModelUnavailable).
+// Rate limits, auth failures and outages must NOT, because retrying those on a
+// different model would multiply load and mask the real problem.
+//
+// All three are on Groq's Production list, and the latter two are Groq's own
+// documented replacements for the model this site used to run.
+// -----------------------------------------------------------------------------
+const MODEL_CHAIN = [
+  "openai/gpt-oss-120b", // Groq's recommended replacement for llama-3.3-70b.
+  "qwen/qwen3.6-27b", // Second recommended replacement; different family.
+  "openai/gpt-oss-20b", // Smallest/cheapest, last resort so we degrade rather than fail.
+] as const;
+
+// Models known to be retired. GROQ_MODEL is operator-supplied and lives in the
+// Cloudflare dashboard, where it is easy to set once and forget for a year, so a
+// stale value there must not be able to break the site.
+const RETIRED_MODELS = new Set([
+  "llama-3.3-70b-versatile",
+  "llama-3.1-8b-instant",
+  "qwen/qwen3-32b",
+  "meta-llama/llama-4-scout-17b-16e-instruct",
+]);
+
+// Builds the ordered candidate list: the operator's override first (when it is
+// not a known-retired ID), then the built-in chain, de-duplicated.
+function modelCandidates(override?: string): string[] {
+  const preferred = override?.trim();
+  const ordered = preferred && !RETIRED_MODELS.has(preferred)
+    ? [preferred, ...MODEL_CHAIN]
+    : [...MODEL_CHAIN];
+
+  return [...new Set(ordered)];
 }
 
-// Chosen because it is on Groq's current *Production* model list (verified at
-// console.groq.com/docs/models), follows long instruction sets faithfully, and
-// streams fast enough to feel instant. Override per-environment via GROQ_MODEL.
-const DEFAULT_MODEL = "llama-3.3-70b-versatile";
+// True when the provider is telling us this specific model cannot serve the
+// request — retired, renamed, or not enabled for this key. Anything else is a
+// real error and should surface as-is.
+function isModelUnavailable(status: number, body: string): boolean {
+  if (status !== 400 && status !== 404) return false;
+
+  const haystack = body.toLowerCase();
+  return (
+    haystack.includes("model_not_found") ||
+    haystack.includes("model_decommissioned") ||
+    haystack.includes("does not exist") ||
+    haystack.includes("has been decommissioned") ||
+    haystack.includes("no longer supported")
+  );
+}
 
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -48,119 +103,6 @@ const MAX_INPUT_CHARS = 1200; // Per-message input cap
 const MAX_HISTORY_TURNS = 8; // Conversation turns retained for context
 const RATE_LIMIT_MAX = 20; // Messages allowed per window, per IP
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-
-// -----------------------------------------------------------------------------
-// KV-backed IP rate limiter.
-//
-// WHY KV AND NOT MODULE STATE: an in-memory Map only lives as long as one V8
-// isolate. Locally that is a single long-lived isolate so a Map appears to work,
-// but on the real edge requests are spread across isolates that are constantly
-// created and recycled, so counts never accumulate and the limit never trips.
-// This was measured: 22 consecutive edge requests produced zero 429s, where the
-// same test locally tripped on request 21 exactly. KV is shared across isolates.
-//
-// KV is eventually consistent, on the order of seconds. Against a 600-second
-// window that is comfortably accurate enough for abuse control.
-//
-// FAILURE MODE: fails OPEN. If KV is unavailable the assistant keeps answering
-// rather than going dark, and a Cloudflare WAF rate-limiting rule on this route
-// is the backstop that protects API spend. A KV blip should not break the site.
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// Collapses a client address to the unit we want to rate limit.
-//
-// IPv4 is used as-is. IPv6 is truncated to its /64 prefix, because a single
-// client is routinely allocated a whole /64 (or larger). Keying on the full
-// address would let anyone increment one hextet to mint a fresh quota, making
-// the limit meaningless — the logs confirmed Cloudflare hands us full IPv6
-// addresses, e.g. 2603:8082:af00:3cf:d918:e843:7b7d:9001.
-//
-// Consequence, and it is intended: everyone behind one /64 (typically one
-// household) shares a single quota.
-// -----------------------------------------------------------------------------
-export function rateLimitKey(ip: string): string {
-  if (!ip.includes(":")) return ip; // IPv4, or the "unknown" fallback.
-
-  // IPv4-mapped IPv6 (::ffff:203.0.113.5) — limit on the embedded IPv4.
-  const mapped = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
-  if (mapped) return mapped[1];
-
-  // Expand "::" so the prefix is taken from the true hextet positions.
-  let groups: string[];
-  if (ip.includes("::")) {
-    const [head, tail] = ip.split("::");
-    const headParts = head ? head.split(":") : [];
-    const tailParts = tail ? tail.split(":") : [];
-    const gap = Math.max(0, 8 - headParts.length - tailParts.length);
-    groups = [...headParts, ...Array(gap).fill("0"), ...tailParts];
-  } else {
-    groups = ip.split(":");
-  }
-
-  return groups
-    .slice(0, 4)
-    .map((h) => (h || "0").toLowerCase())
-    .join(":");
-}
-
-async function isRateLimited(ip: string, store?: KVNamespace): Promise<boolean> {
-  // No binding configured (e.g. local dev without --kv): skip, do not block.
-  if (!store) return false;
-
-  const key = `rl:${rateLimitKey(ip)}`;
-  const now = Date.now();
-  const cutoff = now - RATE_LIMIT_WINDOW_MS;
-
-  try {
-    const raw = await store.get(key);
-
-    // Stored as a JSON array of epoch-ms timestamps.
-    const parsed: unknown = raw ? JSON.parse(raw) : [];
-    const timestamps = Array.isArray(parsed)
-      ? parsed.filter((t): t is number => typeof t === "number" && t > cutoff)
-      : [];
-
-    if (timestamps.length >= RATE_LIMIT_MAX) return true;
-
-    timestamps.push(now);
-
-    // expirationTtl lets KV evict the key once the window has fully elapsed,
-    // so the namespace self-cleans and needs no sweeping.
-    await store.put(key, JSON.stringify(timestamps), {
-      expirationTtl: Math.ceil(RATE_LIMIT_WINDOW_MS / 1000),
-    });
-
-    return false;
-  } catch (err) {
-    console.error("Rate limiter KV error, failing open:", err);
-    return false;
-  }
-}
-
-// -----------------------------------------------------------------------------
-// Same-origin check. Compares the Referer/Origin host against the host actually
-// serving the request, so this works unchanged on localhost, *.pages.dev preview
-// URLs, and the production domain without a hardcoded allowlist.
-// -----------------------------------------------------------------------------
-function isSameOrigin(request: Request): boolean {
-  const selfHost = new URL(request.url).host;
-  const candidate = request.headers.get("Origin") ?? request.headers.get("Referer");
-
-  if (!candidate) return false;
-
-  try {
-    return new URL(candidate).host === selfHost;
-  } catch {
-    return false;
-  }
-}
-
-function json(body: unknown, status: number): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
-  });
-}
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -252,10 +194,12 @@ export const onRequestPost = async (context: {
     return json({ error: "Forbidden." }, 403);
   }
 
-  // CF-Connecting-IP is set by Cloudflare itself on the edge and cannot be
-  // spoofed by the client, so it is safe to key the limiter on.
-  const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
-  if (await isRateLimited(ip, env.RATE_LIMIT)) {
+  const limited = await isRateLimited(clientIp(request), env.RATE_LIMIT, {
+    bucket: "assistant",
+    max: RATE_LIMIT_MAX,
+    windowMs: RATE_LIMIT_WINDOW_MS,
+  });
+  if (limited) {
     return json({ error: "rate_limited" }, 429);
   }
 
@@ -279,31 +223,53 @@ export const onRequestPost = async (context: {
     return json({ error: "Assistant is not configured." }, 503);
   }
 
-  let upstream: Response;
-  try {
-    upstream = await fetch(GROQ_ENDPOINT, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.GROQ_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: env.GROQ_MODEL || DEFAULT_MODEL,
-        temperature: 0.3,
-        max_tokens: 700,
-        stream: true,
-        messages: [{ role: "system", content: buildSystemPrompt() }, ...messages],
-      }),
-    });
-  } catch {
-    return json({ error: "Could not reach the model provider." }, 502);
-  }
+  const systemPrompt = buildSystemPrompt();
+  const candidates = modelCandidates(env.GROQ_MODEL);
 
-  if (!upstream.ok || !upstream.body) {
+  // Walk the candidate models. The body is only read on the failure path, so an
+  // unconsumed successful response can still be streamed straight through.
+  for (let i = 0; i < candidates.length; i++) {
+    const model = candidates[i];
+    const isLast = i === candidates.length - 1;
+
+    let upstream: Response;
+    try {
+      upstream = await fetch(GROQ_ENDPOINT, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          temperature: 0.3,
+          max_tokens: 700,
+          stream: true,
+          messages: [{ role: "system", content: systemPrompt }, ...messages],
+        }),
+      });
+    } catch {
+      return json({ error: "Could not reach the model provider." }, 502);
+    }
+
+    if (upstream.ok && upstream.body) {
+      return new Response(toTextStream(upstream.body), {
+        status: 200,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+          // Which model actually answered. Purely diagnostic, but it turns
+          // "the bot is weird today" into a one-request investigation.
+          "X-Model": model,
+        },
+      });
+    }
+
     // Log the provider's reason server-side; never forward it to the client,
     // since provider errors can echo request details.
     const detail = await upstream.text().catch(() => "");
-    console.error("Groq request failed", upstream.status, detail);
+    console.error(`Groq request failed (model=${model})`, upstream.status, detail);
 
     // The provider throttling us is a distinct, recoverable condition. Masking
     // it as a generic 502 told users "something went wrong" when the honest
@@ -312,15 +278,15 @@ export const onRequestPost = async (context: {
       return json({ error: "upstream_busy" }, 429);
     }
 
-    return json({ error: "The assistant is temporarily unavailable." }, 502);
+    // This model is gone or unavailable to us — try the next one. Anything else
+    // (401, 403, 5xx) is not fixable by switching models, so stop immediately.
+    if (!isModelUnavailable(upstream.status, detail) || isLast) {
+      return json({ error: "The assistant is temporarily unavailable." }, 502);
+    }
+
+    console.warn(`Model ${model} unavailable; falling back to ${candidates[i + 1]}.`);
   }
 
-  return new Response(toTextStream(upstream.body), {
-    status: 200,
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-store",
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
+  // Unreachable: the loop always returns. Present so the function is total.
+  return json({ error: "The assistant is temporarily unavailable." }, 502);
 };
