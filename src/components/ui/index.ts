@@ -6,3 +6,5 @@
 
 export { default as Logo } from "./Logo";       // Brand logo SVG component
 export { default as Navbar } from "./Navbar";   // Navigation bar component
+export { default as SiteFooter } from "./SiteFooter"; // Footer incl. legal links
+export { default as ScrollToTop } from "./ScrollToTop"; // Scroll reset on load

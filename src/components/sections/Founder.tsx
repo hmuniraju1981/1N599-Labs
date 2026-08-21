@@ -4,6 +4,8 @@
 // =============================================================================
 
 import { MapPin, Mail, ExternalLink } from "lucide-react";
+import ContactForm from "./ContactForm";
+import SiteFooter from "@/components/ui/SiteFooter";
 import { COMPANY } from "@/lib/constants";
 
 export default function Founder() {
@@ -58,18 +60,30 @@ export default function Founder() {
                 <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center text-violet-400 flex-shrink-0">
                   <Mail className="w-5 h-5" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-slate-300 font-medium">Email</p>
-                  <p className="text-slate-400">{COMPANY.email}</p>
+                  {/* Was plain text, which gave visitors nothing to click and no
+                      way to copy it reliably on a phone. */}
+                  <a
+                    href={`mailto:${COMPANY.email}`}
+                    className="text-slate-400 hover:text-cyan-400 underline underline-offset-2 decoration-slate-600 hover:decoration-cyan-400 transition-colors break-all"
+                  >
+                    {COMPANY.email}
+                  </a>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-lg bg-pink-500/10 flex items-center justify-center text-pink-400 flex-shrink-0">
                   <ExternalLink className="w-5 h-5" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-slate-300 font-medium">Website</p>
-                  <p className="text-slate-400">www.{COMPANY.domain}</p>
+                  <a
+                    href={`https://${COMPANY.domain}`}
+                    className="text-slate-400 hover:text-cyan-400 underline underline-offset-2 decoration-slate-600 hover:decoration-cyan-400 transition-colors break-all"
+                  >
+                    www.{COMPANY.domain}
+                  </a>
                 </div>
               </div>
             </div>
@@ -80,41 +94,15 @@ export default function Founder() {
             <h3 className="text-xl font-semibold text-slate-100 mb-6">
               Send a Message
             </h3>
-            <form className="space-y-4">
-              <input
-                type="email"
-                placeholder="Your Email"
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all"
-              />
-              <textarea
-                placeholder="Your Message"
-                rows={4}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all resize-none"
-              />
-              <button
-                type="submit"
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-500 text-white font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 hover:scale-[1.02]"
-              >
-                Send Message
-              </button>
-            </form>
+            {/* Extracted into a client component: this section stays a Server
+                Component, and only the form ships interactive JS. */}
+            <ContactForm />
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="mt-20 pt-8 border-t border-white/10">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="text-xl font-bold tracking-tight text-white">
-              <span className="gradient-text">1N599</span> Inc
-            </span>
-            <p className="text-sm text-slate-400">
-              &copy; {new Date().getFullYear()} {COMPANY.name}. All rights reserved.
-            </p>
-            <p className="text-sm text-slate-300 italic">
-              &ldquo;{COMPANY.mission}&rdquo;
-            </p>
-          </div>
-        </footer>
+        {/* Shared with the policy pages, so the legal links cannot go missing on
+            one and not the other. */}
+        <SiteFooter />
       </div>
     </section>
   );

@@ -1,0 +1,50 @@
+// =============================================================================
+// FILE: workers/email/wrangler.jsonc
+// PURPOSE: Configuration for the private mail-transport Worker that backs the
+//          website contact form.
+//
+// WHY THIS WORKER EXISTS AT ALL:
+//          Cloudflare Email Service is only reachable through a `send_email`
+//          binding, and Pages Functions do not support that binding type (see
+//          developers.cloudflare.com/pages/functions/bindings/ — KV, D1, R2,
+//          Durable Objects, Queues and Services are listed; email is not). So
+//          the send has to happen inside a real Worker, and the Pages Function
+//          at functions/api/contact.ts calls into it over a service binding.
+//
+// NOT PUBLICLY REACHABLE — DELIBERATE:
+//          `workers_dev: false` and no `routes` means this Worker has no public
+//          URL. The only thing that can invoke it is a service binding held by
+//          our own Pages project. That matters: a publicly addressable
+//          "send mail" endpoint is an open relay waiting to be found, and no
+//          amount of validation inside it would change that.
+// =============================================================================
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "1n599-email",
+  "main": "src/index.ts",
+
+  // Pinned rather than floating: a compatibility date is a behaviour contract,
+  // and matching the Pages project's date (2026-07-20) keeps the two runtimes
+  // behaving identically.
+  "compatibility_date": "2026-07-20",
+
+  // No *.workers.dev URL. See the header note above.
+  "workers_dev": false,
+
+  "observability": {
+    // Without this, console.error in this Worker goes nowhere and a failing
+    // contact form is invisible. Logs are the only signal we get here.
+    "enabled": true
+  },
+
+  "send_email": [
+    {
+      "name": "EMAIL",
+      // Hard allowlist of one address. Even if this Worker were somehow reached
+      // by an attacker, the single thing it can do is mail the site owner —
+      // it can never be turned into a relay for arbitrary recipients.
+      // Must be a *verified destination address* in Email Routing.
+      "allowed_destination_addresses": ["harshamuniraju6@gmail.com"]
+    }
+  ]
+}

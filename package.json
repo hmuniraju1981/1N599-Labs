@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "preview": "npm run build && wrangler pages dev out --kv RATE_LIMIT",
-    "deploy": "npm run build && wrangler pages deploy out --project-name=1n599-inc"
+    "deploy": "npm run build && wrangler pages deploy out --project-name=1n599-inc",
+    "deploy:email": "wrangler deploy --config workers/email/wrangler.jsonc",
+    "deploy:all": "npm run deploy:email && npm run deploy"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -29,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "4.123.0"
   }
 }

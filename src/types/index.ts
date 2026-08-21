@@ -14,6 +14,17 @@ export interface NavLink {
 }
 
 // -----------------------------------------------------------------------------
+// Legal/policy page link, used in the site footer and on the legal pages
+// themselves so each policy can cross-reference the others.
+// -----------------------------------------------------------------------------
+export interface LegalLink {
+  href: string;        // Route the policy lives at (e.g. "/privacy")
+  label: string;       // Short display text used in the footer
+  title: string;       // Full document title used as the page <h1> and <title>
+  description: string; // One-line summary, used for the page meta description
+}
+
+// -----------------------------------------------------------------------------
 // Feature card type used in the About section
 // -----------------------------------------------------------------------------
 export interface Feature {
