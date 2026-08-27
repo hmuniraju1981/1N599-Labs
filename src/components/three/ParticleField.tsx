@@ -14,6 +14,42 @@ import * as THREE from "three";                   // Three.js core library
 import { COLORS } from "@/lib/constants";         // Color constants for particles
 
 // =============================================================================
+// SEEDED RANDOM
+//
+// WHY NOT Math.random(): the geometry below is built inside useMemo, which runs
+// during render, and React requires render to be pure — the same inputs must
+// give the same output. Math.random() breaks that, and React 19's
+// react-hooks/purity rule flags it as an error (7 of them in this file).
+//
+// It is not a merely theoretical rule. React is free to throw away a useMemo
+// result and recompute it, and does so under StrictMode's double render and when
+// recovering from a concurrent render. With Math.random() each recomputation
+// produces a different cloud, so the scene can visibly jump for no reason.
+//
+// mulberry32 is a well-known 32-bit PRNG: one multiply-xor-shift round, a full
+// 2^32 period, and good enough distribution for scattering decorative points.
+// Seeding it with a fixed constant makes these useMemo blocks genuinely pure —
+// the field looks identically random, but it is the *same* field every time, so
+// a recompute is a no-op and server and client would agree.
+// =============================================================================
+function makeRng(seed: number): () => number {
+  let state = seed >>> 0; // Coerce to unsigned 32-bit.
+
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296; // -> [0, 1)
+  };
+}
+
+// Distinct seeds so the particle cloud and the node network are not correlated;
+// arbitrary values, chosen only because the resulting layouts look good.
+const PARTICLE_SEED = 0x1f599;
+const NEURAL_SEED = 0x5eed1;
+
+// =============================================================================
 // PARTICLES SUB-COMPONENT
 // Renders 800 colored points (particles) that slowly rotate in 3D space.
 // Points are randomly distributed in a 20x20x20 unit cube.
@@ -28,6 +64,9 @@ function Particles() {
   // useMemo: Compute positions and colors once (not on every render)
   // Returns [Float32Array positions, Float32Array colors]
   const [positions, colors] = useMemo(() => {
+    // Seeded, so this block is pure and recomputing it yields the same cloud.
+    const random = makeRng(PARTICLE_SEED);
+
     // Each particle needs 3 floats (x, y, z) — total: count * 3
     const positions = new Float32Array(count * 3);
     // Each particle needs 3 floats for RGB color — total: count * 3
@@ -36,12 +75,12 @@ function Particles() {
     // Loop through each particle and assign random position + color
     for (let i = 0; i < count; i++) {
       // Random position in range [-10, 10] for each axis
-      positions[i * 3] = (Math.random() - 0.5) * 20;     // X coordinate
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20; // Y coordinate
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20; // Z coordinate
+      positions[i * 3] = (random() - 0.5) * 20;     // X coordinate
+      positions[i * 3 + 1] = (random() - 0.5) * 20; // Y coordinate
+      positions[i * 3 + 2] = (random() - 0.5) * 20; // Z coordinate
 
       // Randomly assign one of three brand colors (cyan, violet, pink)
-      const colorChoice = Math.random(); // Random value between 0-1
+      const colorChoice = random(); // Random value between 0-1
       if (colorChoice < 0.33) {
         // Cyan particles (RGB normalized to 0-1 range)
         colors[i * 3] = 0.024;     // R
@@ -117,14 +156,17 @@ function NeuralConnections() {
 
   // useMemo: Compute node positions and connection lines once
   const [positions, linePositions] = useMemo(() => {
+    // Seeded, so this block is pure and recomputing it yields the same network.
+    const random = makeRng(NEURAL_SEED);
+
     // Generate random 3D positions for each node
     const nodes: THREE.Vector3[] = [];
     for (let i = 0; i < nodeCount; i++) {
       nodes.push(
         new THREE.Vector3(
-          (Math.random() - 0.5) * 12, // X: random in [-6, 6]
-          (Math.random() - 0.5) * 12, // Y: random in [-6, 6]
-          (Math.random() - 0.5) * 8   // Z: random in [-4, 4] (shallower depth)
+          (random() - 0.5) * 12, // X: random in [-6, 6]
+          (random() - 0.5) * 12, // Y: random in [-6, 6]
+          (random() - 0.5) * 8   // Z: random in [-4, 4] (shallower depth)
         )
       );
     }

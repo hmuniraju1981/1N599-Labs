@@ -24,10 +24,18 @@ npm run deploy:email # deploy the private mail Worker (only when workers/email c
 npm run deploy:all   # both, in the right order
 ```
 
-`npm run lint` has **7 pre-existing errors** in
-`src/components/three/ParticleField.tsx` (`react-hooks/purity`, `Math.random`
-during render). They predate this baseline. Don't count them as regressions —
-check the count is still 7 rather than expecting a clean run.
+`npm run lint` should be **completely clean**. It is no longer acceptable for it
+to report anything — the 7 long-standing `react-hooks/purity` errors in
+`src/components/three/ParticleField.tsx` were fixed by seeding the geometry with
+a deterministic PRNG instead of calling `Math.random()` inside `useMemo`. Any
+output from lint is now a real regression.
+
+If you need randomness in a component, note the distinction the two 3D
+components illustrate: `Starfield.tsx` calls `Math.random()` freely because it
+does so inside `useEffect`, which is not render. `ParticleField.tsx` builds its
+geometry in `useMemo`, which *is* render and must be pure, so it uses a seeded
+generator. React may discard and recompute a `useMemo`, so an impure one can
+visibly change the scene for no reason.
 
 ## Verifying a change
 
