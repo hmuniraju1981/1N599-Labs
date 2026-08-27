@@ -6,6 +6,7 @@
 //          Cloudflare Pages (or any static hosting provider) at zero cost.
 // =============================================================================
 
+import path from "node:path";
 import type { NextConfig } from "next"; // TypeScript type for the config object
 
 const nextConfig: NextConfig = {
@@ -13,6 +14,14 @@ const nextConfig: NextConfig = {
   // No Node.js server is needed at runtime — pure HTML/CSS/JS files.
   // This enables free hosting on Cloudflare Pages, Netlify, GitHub Pages, etc.
   output: "export",
+
+  // Next infers the Turbopack workspace by walking up for a lockfile. A
+  // pnpm-lock.yaml in the home directory (this machine has one at ~/) would
+  // make the build resolve modules from there instead of this repo, so
+  // posthog-js looks missing even after npm install here.
+  turbopack: {
+    root: path.join(__dirname),
+  },
 
   // Image optimization settings
   images: {
