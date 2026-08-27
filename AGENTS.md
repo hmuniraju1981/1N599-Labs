@@ -103,8 +103,12 @@ forwards to.
 footer, the cross-links on each policy, and `sitemap.ts` all derive from it.
 Adding a policy means one entry there plus one page under `src/app/`.
 
-The policies make specific factual claims: no cookies, no analytics, no
-third-party requests on page load, conversations not stored, stated rate limits.
-**If you add analytics, tracking, a cookie, or conversation logging, the cookie
-policy and privacy policy become false** and must be updated in the same change
-— plus a real consent mechanism before any non-essential cookie ships.
+The policies make specific factual claims: optional PostHog analytics only
+after consent, no advertising pixels, conversations not stored, stated rate
+limits, and that TheReelty is a separate origin that does not share cookies
+with this site. **If you add advertising, session recording, conversation
+logging, or any cookie that is not covered here, the cookie policy and
+privacy policy become false** and must be updated in the same change — plus
+a real consent mechanism before any new non-essential cookie ships.
+`NEXT_PUBLIC_POSTHOG_KEY` is inlined at `next build`. If it is unset,
+analytics is a no-op; do not reuse TheReelty's PostHog project key.

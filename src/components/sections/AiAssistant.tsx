@@ -19,6 +19,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Bot, ChevronDown, RotateCcw, Send } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 import { ASSISTANT_UI, SUGGESTED_PROMPTS } from "../../../content/knowledge";
+import { completeOnboardingStep } from "@/lib/onboarding";
 
 // Mirrors the payload shape the API function validates.
 type Role = "user" | "assistant";
@@ -177,6 +178,7 @@ export default function AiAssistant() {
       if (!trimmed || isStreaming) return;
 
       setInput("");
+      completeOnboardingStep("asked_assistant");
       void send([...messages, { role: "user", content: trimmed }]);
     },
     [isStreaming, messages, send],

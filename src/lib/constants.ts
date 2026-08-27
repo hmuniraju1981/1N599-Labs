@@ -42,7 +42,7 @@ export const NAV_LINKS: NavLink[] = [
 // ISO form is the source of truth; the display string is derived from it so the
 // two cannot drift. Both are needed: <time dateTime> and the sitemap require the
 // machine-readable value, while the visible text should read naturally.
-export const LEGAL_LAST_UPDATED_ISO = "2026-08-21";
+export const LEGAL_LAST_UPDATED_ISO = "2026-08-26";
 
 export const LEGAL_LAST_UPDATED = new Date(
   `${LEGAL_LAST_UPDATED_ISO}T00:00:00Z`,
@@ -119,6 +119,10 @@ export const MISSION_STATS: Stat[] = [
 export const COMPANY = {
   name: "1N599 Inc",                                 // Legal company name
   domain: "1n599inc.ai",                            // Primary domain
+  // The company landing (this host) and the product app are separate origins.
+  // Cookies, localStorage and consent are not shared between them.
+  productName: "TheReelty",
+  productUrl: "https://www.thereelty.com",
   // Lowercase deliberately. Mailbox names are technically case-sensitive per
   // RFC 5321, and although every real provider treats them as insensitive,
   // displaying "contact@1n599Inc.ai" invited people to retype it with the

@@ -6,6 +6,7 @@
 // =============================================================================
 
 import { BrainCircuit, Workflow, CloudCog } from "lucide-react";
+import OpenTheReeltyLink from "./OpenTheReeltyLink";
 
 const products = [
   {
@@ -18,6 +19,7 @@ const products = [
     bgAccent: "from-cyan-500/10 to-blue-500/10",
     image: "/images/real-estate.jpg",
     overlay: "from-[#030712]/90 via-[#030712]/80 to-cyan-950/70",
+    productLink: true,
   },
   {
     icon: <Workflow className="w-10 h-10" />,
@@ -97,6 +99,9 @@ export default function Products() {
                 <p className="text-slate-300 leading-relaxed flex-1 mb-6">
                   {product.description}
                 </p>
+                {"productLink" in product && product.productLink ? (
+                  <OpenTheReeltyLink />
+                ) : null}
               </div>
             </div>
           ))}

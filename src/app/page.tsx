@@ -15,6 +15,7 @@ import About from "@/components/sections/About";         // Company introduction
 import Products from "@/components/sections/Products";   // Industry domain showcase cards
 import Mission from "@/components/sections/Mission";     // Mission statement + stats
 import Founder from "@/components/sections/Founder";     // Team + Contact combined section
+import OnboardingChecklist from "@/components/ui/OnboardingChecklist";
 
 // -----------------------------------------------------------------------------
 // Home Page Component (Server Component)
@@ -38,6 +39,7 @@ export default function Home() {
       <Products />  {/* #products — Real Estate, HR, Healthcare cards */}
       <Mission />   {/* #mission — mission statement + stats */}
       <Founder />   {/* #contact — Team + Contact combined */}
+      <OnboardingChecklist />
     </main>
   );
 }

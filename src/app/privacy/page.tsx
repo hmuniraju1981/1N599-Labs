@@ -4,14 +4,16 @@
 //
 // ACCURACY NOTE: every factual claim below was checked against what this site
 //          actually does, rather than copied from a template. Specifically:
-//          - No cookies are set. Verified against the live response headers:
-//            neither the site nor /api/* returns Set-Cookie.
-//          - There is no analytics, tag manager, advertising pixel or session
-//            recording of any kind in the bundle.
+//          - Optional PostHog analytics runs only after the visitor consents.
+//            Without consent (or without NEXT_PUBLIC_POSTHOG_KEY at build time)
+//            no analytics cookies are set and no PostHog request is made.
+//          - Assistant conversations are not stored by us and are not sent to
+//            PostHog. Advertising pixels and session recording are not used.
 //          - Fonts are self-hosted by next/font at build time, so there is no
 //            runtime request to Google Fonts and no IP disclosure to Google.
-//          - The only two processors that receive personal data are Cloudflare
-//            (hosting, mail) and Groq (assistant inference).
+//          - Processors that may receive personal data: Cloudflare (hosting,
+//            mail), Groq (assistant inference), and PostHog (analytics, only
+//            with consent).
 //          A privacy policy that overstates collection is as much a compliance
 //          problem as one that understates it, so this stays in sync with the
 //          code. If data handling changes, this page changes with it.
@@ -49,11 +51,18 @@ export default function PrivacyPolicy() {
     >
       <Callout>
         <p>
-          <Term>The short version.</Term> This website sets no cookies and runs no
-          analytics, advertising or tracking of any kind. We only receive personal
-          information when you choose to send it: a message through the contact
-          form, or whatever you type into the AI assistant. We do not sell or share
-          personal information, and we never use it to build advertising profiles.
+          <Term>The short version.</Term> We only receive personal information when
+          you choose to send it (a contact-form message, or whatever you type into
+          the AI assistant), plus optional analytics if you accept the cookie
+          banner. Analytics is PostHog; it records page views and five named
+          events — <Term>asked_assistant</Term>, <Term>explored_products</Term>,{" "}
+          <Term>opened_the_reelty</Term>, <Term>sent_enquiry</Term>,{" "}
+          <Term>shared_with_teammate</Term> — and it does not receive the contents
+          of your assistant conversation. We do not use advertising pixels, we do
+          not sell personal information, and we never use it to build advertising
+          profiles. Our product app, {COMPANY.productName}, is a separate site at{" "}
+          {COMPANY.productUrl.replace(/^https:\/\//, "")} and does not share cookies
+          with this one.
         </p>
       </Callout>
 
@@ -99,6 +108,29 @@ export default function PrivacyPolicy() {
             <A href="/ai-disclaimer">AI Assistant Terms &amp; Disclaimer</A>.
           </Definition>
 
+          <Definition term="Optional analytics (PostHog)">
+            If you accept analytics on the cookie banner, we load PostHog in your
+            browser. It then records that you visited a page on this site, and may
+            record these five events when you take the matching action:{" "}
+            <Term>asked_assistant</Term> (you send a message to the assistant),{" "}
+            <Term>explored_products</Term> (the products section comes into view),{" "}
+            <Term>opened_the_reelty</Term> (you open {COMPANY.productName}),{" "}
+            <Term>sent_enquiry</Term> (the contact form is accepted), and{" "}
+            <Term>shared_with_teammate</Term> (you use the share control). The
+            event is a name only — we do not attach the text of your question, your
+            email, or your message. If you choose &ldquo;Essential only&rdquo;, or
+            you never decide, PostHog is not loaded and these events are not sent.
+          </Definition>
+
+          <Definition term="Consent and onboarding storage">
+            Your analytics choice is kept in localStorage on this device under the
+            key <code className="text-cyan-300 text-sm">1n599-consent</code>. On the
+            homepage, a getting-started checklist stores which of the five steps
+            you have finished under{" "}
+            <code className="text-cyan-300 text-sm">1n599-onboarding</code>. That
+            progress stays in your browser; we do not read it on the server.
+          </Definition>
+
           <Definition term="Abuse-prevention data">
             To stop automated abuse of the assistant and the contact form, we
             briefly record a <Term>shortened</Term> form of your IP address
@@ -124,17 +156,21 @@ export default function PrivacyPolicy() {
         <SubHeading>What we do not collect</SubHeading>
         <UL>
           <LI>
-            No cookies. This site does not set cookies, and it does not use
-            localStorage or similar client-side storage to track you.
+            No advertising pixels, tag managers, or cross-site remarketing. Links
+            to other sites are ordinary hyperlinks.
           </LI>
           <LI>
-            No analytics or measurement tools, no tag managers, no advertising
-            pixels, and no session recording or heatmapping.
+            No session recording, heatmapping, or conversation logging. Assistant
+            messages are not written to our servers and are not sent to PostHog.
+          </LI>
+          <LI>
+            No analytics unless you accept it. Rejecting the banner, or leaving it
+            unanswered, leaves PostHog unloaded.
           </LI>
           <LI>
             No third-party font, script or media requests at page load. Web fonts
-            are bundled with the site at build time, so loading a page does not
-            disclose your IP address to any font provider.
+            are bundled with the site at build time. PostHog is requested only
+            after analytics consent.
           </LI>
           <LI>
             No special category data, biometric data, precise geolocation, or
@@ -161,6 +197,12 @@ export default function PrivacyPolicy() {
             spam filtering and abuse prevention.
           </LI>
           <LI>
+            <Term>To understand how this landing site is used</Term> — only if you
+            accept analytics. We use that to see whether people find the assistant,
+            the products, {COMPANY.productName}, the contact form, and the share
+            control.
+          </LI>
+          <LI>
             <Term>To comply with law</Term> where we are legally required to
             retain or produce information.
           </LI>
@@ -179,8 +221,11 @@ export default function PrivacyPolicy() {
           </LI>
           <LI>
             <Term>Consent</Term> — where you voluntarily submit information
-            through the contact form or the assistant. You can withdraw consent at
-            any time by asking us to delete what you sent.
+            through the contact form or the assistant, and for optional analytics
+            cookies and similar storage. You can withdraw contact-form consent by
+            asking us to delete what you sent, and you can withdraw analytics
+            consent at any time on the{" "}
+            <A href="/cookies">Cookie Policy</A> page.
           </LI>
           <LI>
             <Term>Legal obligation</Term> — where retention or disclosure is
@@ -215,7 +260,25 @@ export default function PrivacyPolicy() {
             <A href="https://groq.com/privacy-policy/">Groq&rsquo;s privacy policy</A>
             .
           </Definition>
+
+          <Definition term="PostHog, Inc. — product analytics (only with consent)">
+            If you accept analytics, your browser loads PostHog and sends it page
+            views and the five events named in section 2. PostHog is a processor
+            acting on our instructions for this website. It is not loaded if you
+            refuse, and it is not sent assistant transcripts or contact-form
+            contents. See{" "}
+            <A href="https://posthog.com/privacy">PostHog&rsquo;s privacy policy</A>.
+          </Definition>
         </DefinitionList>
+
+        <P>
+          {COMPANY.productName} at{" "}
+          <A href={COMPANY.productUrl}>{COMPANY.productUrl.replace(/^https:\/\//, "")}</A>{" "}
+          is a separate product on a separate origin. This website does not share
+          cookies, localStorage or consent with it. Use of {COMPANY.productName} is
+          governed by that product&rsquo;s own terms and privacy notice, not by this
+          page.
+        </P>
 
         <P>
           We may also disclose information where we are legally compelled to (for
@@ -240,7 +303,17 @@ export default function PrivacyPolicy() {
             The conversation exists only in your browser for the length of your
             visit and is gone when you close or reload the page. Our inference
             provider may retain the request transiently for abuse monitoring under
-            its own terms.
+            its own terms. We do not send those messages to PostHog.
+          </LI>
+          <LI>
+            <Term>Analytics events</Term>, if you consented, are retained in our
+            PostHog project according to that project&rsquo;s retention settings,
+            and you can stop further collection at any time from the{" "}
+            <A href="/cookies">Cookie Policy</A>.
+          </LI>
+          <LI>
+            <Term>Consent and onboarding records</Term> stay in your browser until
+            you clear site data for {COMPANY.domain}.
           </LI>
           <LI>
             <Term>Rate-limit records</Term> expire automatically within 10 minutes
@@ -336,10 +409,11 @@ export default function PrivacyPolicy() {
           12 months. We do not knowingly sell or share the personal information of
           consumers under 16. The categories of personal information we collect are
           identifiers (email address, name, IP address) and internet activity
-          information (request metadata), together with the contents of
-          communications you choose to send us, as described in section 2. We do
-          not use or disclose sensitive personal information for purposes requiring
-          a right to limit.
+          information (request metadata, and — only with your consent — page views
+          and the five analytics events named in section 2), together with the
+          contents of communications you choose to send us, as described in section
+          2. We do not use or disclose sensitive personal information for purposes
+          requiring a right to limit.
         </P>
 
         <SubHeading>Texas, and other US state privacy laws</SubHeading>

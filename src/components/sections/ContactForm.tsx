@@ -20,6 +20,7 @@
 import { useCallback, useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, Send } from "lucide-react";
 import { COMPANY } from "@/lib/constants";
+import { completeOnboardingStep } from "@/lib/onboarding";
 
 // Kept in sync with the caps enforced in functions/api/contact.ts. Client-side
 // limits are a courtesy to the user, never a security boundary — the server
@@ -91,6 +92,7 @@ export default function ContactForm() {
 
         if (res.ok) {
           setStatus({ kind: "sent" });
+          completeOnboardingStep("sent_enquiry");
           // Clear the fields so a success message cannot be mistaken for an
           // unsent draft still sitting in the form.
           setName("");

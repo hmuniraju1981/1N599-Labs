@@ -12,6 +12,12 @@ import type { Metadata } from "next";              // Next.js metadata type for 
 import { Geist, Geist_Mono } from "next/font/google"; // Google Fonts with next/font optimization
 import "./globals.css";                            // Global stylesheet import
 import ScrollToTop from "@/components/ui/ScrollToTop"; // Resets scroll to top on load
+import CookieConsent from "@/components/ui/CookieConsent";
+import { PostHogProvider } from "@/lib/posthog";
+import { COMPANY } from "@/lib/constants";
+
+const SITE_URL = `https://${COMPANY.domain}`;
+const OG_IMAGE = `${SITE_URL}/og-image.png`;
 
 // -----------------------------------------------------------------------------
 // FONT CONFIGURATION
@@ -38,6 +44,7 @@ const geistMono = Geist_Mono({
 // This improves SEO and social media link previews.
 // -----------------------------------------------------------------------------
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   // Browser tab title
   title: "1N599 Inc | AI Products Built for Any Industry",
   // Meta description for search engines (max ~160 chars recommended)
@@ -58,14 +65,33 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
   },
+  alternates: {
+    canonical: SITE_URL,
+  },
   // OpenGraph metadata — controls how the site appears when shared on social media
   openGraph: {
     title: "1N599 Inc | Engineering Intelligence, Empowering Humanity", // Social share title
     description:
       "Product-based AI innovation, proven in real estate and customizable for any industry.", // Social share description
-    url: "https://1n599inc.ai",                     // Canonical URL
-    siteName: "1N599 Inc",                            // Site name for social platforms
-    type: "website",                                 // Content type (website, article, etc.)
+    url: SITE_URL,
+    siteName: COMPANY.name,
+    type: "website",
+    locale: "en_US",
+    images: [
+      {
+        url: OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: "1N599 Inc — AI products built to adapt across industries",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "1N599 Inc | Engineering Intelligence, Empowering Humanity",
+    description:
+      "Product-based AI innovation, proven in real estate and customizable for any industry.",
+    images: [OG_IMAGE],
   },
 };
 
@@ -106,8 +132,11 @@ export default function RootLayout({
           href="/images/domains.jpg"
           fetchPriority="high"
         />
-        <ScrollToTop /> {/* Forces every visit to start at the top of the page */}
-        {children} {/* Current page content renders here */}
+        <PostHogProvider>
+          <ScrollToTop /> {/* Forces every visit to start at the top of the page */}
+          {children} {/* Current page content renders here */}
+          <CookieConsent />
+        </PostHogProvider>
       </body>
     </html>
   );

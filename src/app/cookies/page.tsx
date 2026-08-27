@@ -2,24 +2,18 @@
 // FILE: src/app/cookies/page.tsx
 // PURPOSE: Cookie Policy (/cookies).
 //
-// WHY THIS PAGE SAYS "WE SET NO COOKIES" RATHER THAN LISTING A TABLE OF THEM:
-//          because that is the truth, and it was verified rather than assumed.
-//          The live site returns no Set-Cookie header on the document or on
-//          /api/*, there is no analytics or advertising code in the bundle, and
-//          next/font self-hosts the webfonts at build time so there is no
-//          third-party request on page load.
-//
-//          The consequence, stated in section 4, is that no consent banner is
-//          required. Publishing a boilerplate cookie policy that describes
-//          analytics cookies this site does not set — and then adding a banner to
-//          ask permission for them — would be actively misleading. If tracking is
-//          ever added, this page and a consent mechanism must both change first.
+//          Optional PostHog analytics is loaded only after consent. Necessary
+//          storage (this choice, and homepage onboarding progress) lives in
+//          localStorage on this origin. Advertising pixels are not used.
+//          Conversations are not stored. TheReelty is a separate origin and
+//          does not share cookies with this site.
 // =============================================================================
 
 import type { Metadata } from "next";
 import LegalDocument from "@/components/legal/LegalDocument";
 import { A, Callout, Clause, LI, P, Term, UL } from "@/components/legal/prose";
 import { COMPANY, legalLink } from "@/lib/constants";
+import { ConsentControls } from "@/components/ui/CookieConsent";
 
 const POLICY = legalLink("/cookies");
 
@@ -33,13 +27,16 @@ export default function CookiePolicy() {
   return (
     <LegalDocument
       title={POLICY.title}
-      intro={`This policy explains our use of cookies and similar technologies on ${COMPANY.domain}. It is short, because we do not use them for tracking.`}
+      intro={`This policy explains our use of cookies and similar technologies on ${COMPANY.domain}, and how you control them.`}
     >
       <Callout>
         <p>
-          <Term>The short version.</Term> This website sets no cookies of its own.
-          It runs no analytics, no advertising and no tracking technology, so there
-          is nothing here to consent to and no cookie banner to dismiss.
+          <Term>The short version.</Term> We ask before running analytics. If you
+          accept, PostHog may set cookies on this site and record page views plus
+          five named events. If you choose essential only — or you never choose —
+          those cookies are not set. We do not use advertising cookies.{" "}
+          {COMPANY.productName} is a separate app and does not share cookies with
+          this website.
         </p>
       </Callout>
 
@@ -57,17 +54,44 @@ export default function CookiePolicy() {
 
       <Clause id="what-we-use" number={2} title="What this website uses">
         <P>
-          Nothing. Specifically, we do not use:
+          <Term>Necessary (no consent required).</Term>
         </P>
         <UL>
           <LI>
-            <Term>Analytics or measurement cookies.</Term> There is no Google
-            Analytics, no tag manager, and no privacy-preserving analytics product
-            either. We do not measure visits.
+            <Term>Your analytics choice.</Term> Stored in localStorage under{" "}
+            <code className="text-cyan-300 text-sm">1n599-consent</code> so we
+            remember whether you accepted or refused analytics and do not ask on
+            every page load.
           </LI>
           <LI>
-            <Term>Advertising or targeting cookies.</Term> We run no advertising and
-            no remarketing, and there are no third-party ad pixels on this site.
+            <Term>Homepage getting-started progress.</Term> Stored in localStorage
+            under <code className="text-cyan-300 text-sm">1n599-onboarding</code>{" "}
+            so the five-step checklist can pick up where you left off. It is not
+            used to identify you across sites.
+          </LI>
+          <LI>
+            <Term>Cloudflare security cookies</Term> may appear in some
+            circumstances — see section 3.
+          </LI>
+        </UL>
+        <P>
+          <Term>Analytics (consent required).</Term> If you click &ldquo;Accept
+          analytics&rdquo;, we load PostHog from this site&rsquo;s own 1N599 Inc
+          project. PostHog may then set first-party cookies and use localStorage
+          on {COMPANY.domain} so it can tell returning browsers apart for
+          measurement. It records page views and these events, in this order when
+          you take the matching action: <Term>asked_assistant</Term>,{" "}
+          <Term>explored_products</Term>, <Term>opened_the_reelty</Term>,{" "}
+          <Term>sent_enquiry</Term>, <Term>shared_with_teammate</Term>. It does
+          not receive assistant transcripts, contact-form contents, or advertising
+          audiences.
+        </P>
+        <P>We do not use:</P>
+        <UL>
+          <LI>
+            <Term>Advertising or targeting cookies.</Term> We run no advertising
+            and no remarketing, and there are no third-party ad pixels on this
+            site.
           </LI>
           <LI>
             <Term>Social media cookies.</Term> Links to social profiles are plain
@@ -75,20 +99,23 @@ export default function CookiePolicy() {
             until you actually click through.
           </LI>
           <LI>
-            <Term>Preference cookies.</Term> There is nothing to remember: the site
-            has no accounts, and no theme or language switcher.
-          </LI>
-          <LI>
-            <Term>Client-side storage for tracking.</Term> We do not write to
-            localStorage or sessionStorage to identify you. Your AI assistant
-            conversation is held in the page&rsquo;s memory only and disappears when
-            you close or reload the tab.
+            <Term>Session recording or conversation logging.</Term> The AI
+            assistant conversation is held in the page&rsquo;s memory only and
+            disappears when you close or reload the tab.
           </LI>
         </UL>
         <P>
           Web fonts are bundled into the site at build time and served from our own
           domain, so simply loading a page does not disclose your IP address to a
-          font provider.
+          font provider. PostHog is requested only after you accept analytics.
+        </P>
+        <P>
+          {COMPANY.productName} at{" "}
+          <A href={COMPANY.productUrl}>
+            {COMPANY.productUrl.replace(/^https:\/\//, "")}
+          </A>{" "}
+          is a different origin. Opening it does not send this site&rsquo;s cookies
+          there, and that product&rsquo;s cookies are not set on {COMPANY.domain}.
         </P>
       </Clause>
 
@@ -113,34 +140,30 @@ export default function CookiePolicy() {
           and its{" "}
           <A href="https://www.cloudflare.com/privacypolicy/">privacy policy</A>.
         </P>
-        <P>
-          At the time this policy was last updated, no such cookie was observed on
-          normal page loads of this site.
-        </P>
       </Clause>
 
-      <Clause id="consent" number={4} title="Why there is no cookie banner">
+      <Clause id="consent" number={4} title="How we ask for consent">
         <P>
-          Consent is required for cookies that are not strictly necessary. Because
-          we set none of those, there is nothing for you to agree to, and a banner
-          would be theatre — it would ask permission for tracking that does not
-          exist while adding a click to every visit.
+          Non-essential cookies — here, PostHog analytics — are off until you
+          accept them. The banner on this site is that mechanism:{" "}
+          <Term>Accept analytics</Term> loads PostHog; <Term>Essential only</Term>{" "}
+          keeps it unloaded. There is no pre-ticked box, and closing the tab
+          without choosing is treated as a refusal.
         </P>
         <P>
-          If we ever introduce analytics or any other non-essential technology, we
-          will update this policy and put a genuine consent mechanism in place
-          before doing so, not after.
+          You can change the choice on this page at any time:
         </P>
+        <ConsentControls />
       </Clause>
 
       <Clause id="controlling" number={5} title="Controlling cookies yourself">
         <P>
-          You can block or delete cookies in your browser settings, and you can send
-          a &ldquo;Do Not Track&rdquo; or Global Privacy Control signal. Since we do
-          no tracking, these settings will not change anything about how this site
-          behaves — but blocking Cloudflare&rsquo;s security cookies may in some
-          cases cause additional bot checks. Every major browser documents how to
-          manage cookies in its help pages.
+          You can also block or delete cookies in your browser settings, and you
+          can send a Global Privacy Control signal. Blocking cookies after you
+          have accepted analytics will stop PostHog persisting an identifier, and
+          blocking Cloudflare&rsquo;s security cookies may in some cases cause
+          additional bot checks. Every major browser documents how to manage
+          cookies in its help pages.
         </P>
       </Clause>
 

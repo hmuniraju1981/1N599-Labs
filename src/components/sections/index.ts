@@ -11,3 +11,4 @@ export { default as Mission } from "./Mission";     // Mission statement section
 export { default as Founder } from "./Founder";     // Team + contact + footer section
 export { default as ContactForm } from "./ContactForm"; // "Send a Message" form (client)
 export { default as AiAssistant } from "./AiAssistant";  // AI assistant section
+export { default as OpenTheReeltyLink } from "./OpenTheReeltyLink";
