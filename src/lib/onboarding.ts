@@ -88,12 +88,23 @@ function parse(raw: string | null): FunnelEvent[] {
   }
 }
 
+// React 19's useSyncExternalStore compares snapshots with Object.is. parse()
+// always returns a new array, which infinite-loops the checklist (the live
+// "getServerSnapshot should be cached" crash). Keep the last raw string and
+// parsed list so readOnboarding is referentially stable until storage changes.
+let cachedRaw: string | null | undefined;
+let cachedSteps: FunnelEvent[] = [];
+
 export function readOnboarding(): FunnelEvent[] {
-  if (!isBrowser()) return [];
+  if (!isBrowser()) return cachedSteps;
   try {
-    return parse(window.localStorage.getItem(ONBOARDING_STORAGE_KEY));
+    const raw = window.localStorage.getItem(ONBOARDING_STORAGE_KEY);
+    if (raw === cachedRaw) return cachedSteps;
+    cachedRaw = raw;
+    cachedSteps = parse(raw);
+    return cachedSteps;
   } catch {
-    return [];
+    return cachedSteps;
   }
 }
 
@@ -120,11 +131,14 @@ export function completeOnboardingStep(id: FunnelEvent): void {
   if (completed.includes(id)) return;
 
   const next = [...completed, id];
+  const serialized = JSON.stringify(next);
   try {
-    window.localStorage.setItem(ONBOARDING_STORAGE_KEY, JSON.stringify(next));
+    window.localStorage.setItem(ONBOARDING_STORAGE_KEY, serialized);
   } catch {
     // Still notify this session if quota or private mode blocks persistence.
   }
+  cachedRaw = serialized;
+  cachedSteps = next;
   window.dispatchEvent(new Event(CHANGE_EVENT));
 
   void import("./posthog").then((mod) => {
