@@ -15,9 +15,7 @@ import ScrollToTop from "@/components/ui/ScrollToTop"; // Resets scroll to top o
 import CookieConsent from "@/components/ui/CookieConsent";
 import { PostHogProvider } from "@/lib/posthog";
 import { COMPANY } from "@/lib/constants";
-
-const SITE_URL = `https://${COMPANY.domain}`;
-const OG_IMAGE = `${SITE_URL}/og-image.png`;
+import { OG_IMAGE, SITE_URL } from "@/lib/seo";
 
 // -----------------------------------------------------------------------------
 // FONT CONFIGURATION

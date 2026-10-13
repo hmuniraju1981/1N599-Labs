@@ -10,6 +10,7 @@
 // =============================================================================
 
 import type { Metadata } from "next";
+import { legalMetadata } from "@/lib/seo";
 import LegalDocument from "@/components/legal/LegalDocument";
 import { A, Callout, Clause, LI, P, Term, UL } from "@/components/legal/prose";
 import { COMPANY, legalLink } from "@/lib/constants";
@@ -17,11 +18,7 @@ import { ConsentControls } from "@/components/ui/CookieConsent";
 
 const POLICY = legalLink("/cookies");
 
-export const metadata: Metadata = {
-  title: `${POLICY.title} | ${COMPANY.name}`,
-  description: POLICY.description,
-  alternates: { canonical: `https://${COMPANY.domain}/cookies` },
-};
+export const metadata: Metadata = legalMetadata("/cookies");
 
 export default function CookiePolicy() {
   return (

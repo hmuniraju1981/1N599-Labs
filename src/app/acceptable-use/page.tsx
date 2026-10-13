@@ -8,17 +8,14 @@
 // =============================================================================
 
 import type { Metadata } from "next";
+import { legalMetadata } from "@/lib/seo";
 import LegalDocument from "@/components/legal/LegalDocument";
 import { A, Clause, LI, P, SubHeading, Term, UL } from "@/components/legal/prose";
 import { COMPANY, legalLink } from "@/lib/constants";
 
 const POLICY = legalLink("/acceptable-use");
 
-export const metadata: Metadata = {
-  title: `${POLICY.title} | ${COMPANY.name}`,
-  description: POLICY.description,
-  alternates: { canonical: `https://${COMPANY.domain}/acceptable-use` },
-};
+export const metadata: Metadata = legalMetadata("/acceptable-use");
 
 export default function AcceptableUsePolicy() {
   return (
