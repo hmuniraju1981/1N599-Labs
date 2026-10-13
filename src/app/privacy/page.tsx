@@ -20,6 +20,7 @@
 // =============================================================================
 
 import type { Metadata } from "next";
+import { legalMetadata } from "@/lib/seo";
 import LegalDocument from "@/components/legal/LegalDocument";
 import {
   A,
@@ -37,11 +38,7 @@ import { COMPANY, legalLink } from "@/lib/constants";
 
 const POLICY = legalLink("/privacy");
 
-export const metadata: Metadata = {
-  title: `${POLICY.title} | ${COMPANY.name}`,
-  description: POLICY.description,
-  alternates: { canonical: `https://${COMPANY.domain}/privacy` },
-};
+export const metadata: Metadata = legalMetadata("/privacy");
 
 export default function PrivacyPolicy() {
   return (

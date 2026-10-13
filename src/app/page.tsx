@@ -16,6 +16,7 @@ import Products from "@/components/sections/Products";   // Industry domain show
 import Mission from "@/components/sections/Mission";     // Mission statement + stats
 import Founder from "@/components/sections/Founder";     // Team + Contact combined section
 import OnboardingChecklist from "@/components/ui/OnboardingChecklist";
+import { SITE_JSON_LD } from "@/lib/seo";
 
 // -----------------------------------------------------------------------------
 // Home Page Component (Server Component)
@@ -27,6 +28,13 @@ import OnboardingChecklist from "@/components/ui/OnboardingChecklist";
 export default function Home() {
   return (
     <main className="relative">
+      {/* Organization + WebSite structured data for search engines and LLMs. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(SITE_JSON_LD).replace(/</g, "\\u003c"),
+        }}
+      />
       <Navbar />    {/* Sticky navigation — always visible at top */}
       {/* Hero and assistant share ONE continuous background, so the photograph
           and starfield run behind both instead of stopping at a hard line

@@ -11,17 +11,14 @@
 // =============================================================================
 
 import type { Metadata } from "next";
+import { legalMetadata } from "@/lib/seo";
 import LegalDocument from "@/components/legal/LegalDocument";
 import { A, Callout, Clause, LI, P, SubHeading, Term, UL } from "@/components/legal/prose";
 import { COMPANY, legalLink } from "@/lib/constants";
 
 const POLICY = legalLink("/terms");
 
-export const metadata: Metadata = {
-  title: `${POLICY.title} | ${COMPANY.name}`,
-  description: POLICY.description,
-  alternates: { canonical: `https://${COMPANY.domain}/terms` },
-};
+export const metadata: Metadata = legalMetadata("/terms");
 
 export default function TermsOfService() {
   return (
