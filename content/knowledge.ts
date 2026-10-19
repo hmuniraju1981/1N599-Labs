@@ -33,6 +33,7 @@ export interface Product {
   logo: string;
   category: string;
   tagline: string;
+  summary: string; // One sentence, shown on the product tiles.
   facts: readonly string[];
   pricing: readonly string[];
   prompts: readonly string[];
@@ -46,6 +47,8 @@ export const PRODUCTS: readonly Product[] = [
     logo: "/products/thereelty.png",
     category: "Real estate",
     tagline: "Agentic AI for real estate",
+    summary:
+      "List, market and close property deals with AI, from listing copy and reels to offers, forms and CRM.",
     facts: [
       "Real estate technology platform (SaaS) operated by 1N599 Inc (dba TheReelty), serving the United States with Texas-specific features: TREC promulgated forms and TREC licence verification.",
       "Owners publish a property for sale or for rent without a listing agent: a public listing page, AI-generated listing descriptions, photo and video upload, virtual staging credits, short video reels on TheReelty's feed, tour scheduling and a showing inbox, direct messaging with buyers and renters, offers received/countered/accepted in the platform, and Texas promulgated forms.",
@@ -76,6 +79,8 @@ export const PRODUCTS: readonly Product[] = [
     logo: "/products/medifisys.svg",
     category: "Healthcare",
     tagline: "Healthcare tourism platform",
+    summary:
+      "Compare treatment packages at accredited hospitals abroad and get a written quote with a single request.",
     facts: [
       "A healthcare-tourism marketplace. Patients compare procedures at accredited partner hospitals abroad, with package prices published up front, and send one booking request covering the procedure plus the equipment and medicines needed afterwards.",
       "Every listing carries the surgeon's name, how many of these operations they have done, the hospital's accreditation (issuing body named) and what the price does and does not include. Ten specialties, including cardiac, orthopaedic, dental and fertility.",
@@ -102,6 +107,8 @@ export const PRODUCTS: readonly Product[] = [
     logo: "/products/bonafidehire.svg",
     category: "Hiring",
     tagline: "Async video interviews with integrity you can defend",
+    summary:
+      "Run async video interviews that flag integrity issues in the recording environment, without ever auto-rejecting a candidate.",
     facts: [
       "Asynchronous video interviewing for recruiters and hiring teams that need integrity evidence that is explainable and fair to candidates.",
       "It scores the recording environment, not the candidate: every input to the integrity score is an action a browser took (a blocked paste, a window that lost focus), never an inference about a face, a voice or a writing style. Each observation carries its most likely innocent explanation, and a person decides.",
@@ -132,6 +139,8 @@ export const PRODUCTS: readonly Product[] = [
     logo: "/products/sourced.svg",
     category: "Marketing",
     tagline: "Campaign email where every claim cites its source",
+    summary:
+      "Turn your own product documents into campaign emails where every claim is cited and a person approves every send.",
     facts: [
       "Writes campaign email from a company's own product documents, quotes the source passage behind every claim, and sends nothing until a person approves it. Any company can create an account and gets its own private workspace.",
       "How it works: add a brand and upload product guides, decks and pricing sheets (PDF, Word, PowerPoint or Markdown); Sourced keeps every version and uses only the latest approved one. It writes single-feature emails, feature digests or drip series for agents, brokers, employers, candidates or hospitals. A person reviews the email exactly as it will be sent.",
