@@ -10,7 +10,6 @@
 
 import Image from "next/image";
 import { ArrowUpRight, CloudCog, Workflow } from "lucide-react";
-import NextSectionCue from "@/components/ui/NextSectionCue";
 import { completeOnboardingStep } from "@/lib/onboarding";
 import { PRODUCTS } from "../../../content/knowledge";
 
@@ -153,7 +152,6 @@ export default function Products() {
         </div>
       </div>
 
-      <NextSectionCue href="#mission" label="Mission" />
     </section>
   );
 }
