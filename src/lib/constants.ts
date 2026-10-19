@@ -108,7 +108,7 @@ export function legalLink(href: string): LegalLink {
 // Displayed as highlight cards within the Mission section.
 // -----------------------------------------------------------------------------
 export const MISSION_STATS: Stat[] = [
-  { number: "1+", label: "AI Products & Growing" }, // Number of domains we serve
+  { number: "4+", label: "AI Products & Growing" }, // Shipping products; see PRODUCTS in content/knowledge.ts
   { number: "Any", label: "Industry Opportunity" }, // Our core approach
   { number: "∞", label: "Commitment to You" },     // Symbolizes endless dedication
 ];
