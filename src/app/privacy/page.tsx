@@ -12,7 +12,7 @@
 //          - Fonts are self-hosted by next/font at build time, so there is no
 //            runtime request to Google Fonts and no IP disclosure to Google.
 //          - Processors that may receive personal data: Cloudflare (hosting,
-//            mail), Groq (assistant inference), and PostHog (analytics, only
+//            mail), Anthropic (assistant inference), and PostHog (analytics, only
 //            with consent).
 //          A privacy policy that overstates collection is as much a compliance
 //          problem as one that understates it, so this stays in sync with the
@@ -250,11 +250,11 @@ export default function PrivacyPolicy() {
             .
           </Definition>
 
-          <Definition term="Groq, Inc. — AI inference">
+          <Definition term="Anthropic, PBC — AI inference">
             Receives the contents of your AI assistant conversation in order to
             generate a reply. Your IP address and identity are not sent — the
             request is made by our server, not your browser. See{" "}
-            <A href="https://groq.com/privacy-policy/">Groq&rsquo;s privacy policy</A>
+            <A href="https://www.anthropic.com/legal/privacy">Anthropic&rsquo;s privacy policy</A>
             .
           </Definition>
 
