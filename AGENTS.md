@@ -76,7 +76,7 @@ hour.
   work locally (one long-lived isolate) and silently never triggers on the edge.
   See the comment in `server/edge.ts`.
 - **Bindings live in the Cloudflare dashboard, not a wrangler config**, for the
-  Pages project. A dashboard variable overrides anything in code — a `GROQ_MODEL`
+  Pages project. A dashboard variable overrides anything in code — a model ID (then `GROQ_MODEL`)
   pinned there to a retired model once broke the assistant while the code looked
   correct. Check `wrangler pages secret list` and the project's
   `deployment_configs` before concluding a code change is enough.
@@ -84,11 +84,12 @@ hour.
 ## Model deprecations
 
 `functions/api/assistant.ts` walks `MODEL_CHAIN` and advances only on
-availability failures, so a shutdown degrades instead of breaking. When Groq
-retires a model, add its ID to `RETIRED_MODELS` and put the replacement at the
-head of `MODEL_CHAIN`. Current production model IDs:
-https://console.groq.com/docs/models — deprecations:
-https://console.groq.com/docs/deprecations
+availability failures, so a shutdown degrades instead of breaking. The provider
+is Anthropic (Claude Messages API, secret `ANTHROPIC_API_KEY`, optional
+`ANTHROPIC_MODEL`). When Anthropic retires a model, add its ID to
+`RETIRED_MODELS` and put the replacement at the head of `MODEL_CHAIN`. Current
+model IDs: https://platform.claude.com/docs/en/about-claude/models/overview —
+deprecations: https://platform.claude.com/docs/en/about-claude/model-deprecations
 
 ## Email
 

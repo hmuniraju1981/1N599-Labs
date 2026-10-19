@@ -60,7 +60,7 @@ export default function AiDisclaimer() {
           When you send a message, your browser posts the conversation to our own
           server-side endpoint on this domain. That endpoint adds a set of
           instructions describing our business and forwards the conversation to{" "}
-          <Term>Groq, Inc.</Term>, which runs the large language model that generates
+          <Term>Anthropic, PBC</Term>, which runs the Claude large language model that generates
           the reply. The reply is streamed back to you.
         </P>
         <UL>
@@ -76,7 +76,7 @@ export default function AiDisclaimer() {
           <LI>
             The provider may process and transiently retain the request under its own
             terms, including for abuse monitoring. See{" "}
-            <A href="https://groq.com/privacy-policy/">Groq&rsquo;s privacy policy</A>
+            <A href="https://www.anthropic.com/legal/privacy">Anthropic&rsquo;s privacy policy</A>
             .
           </LI>
           <LI>

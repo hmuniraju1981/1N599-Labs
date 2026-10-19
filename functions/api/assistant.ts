@@ -10,8 +10,8 @@
 //          export, so the server-side hop lives here instead, on the Cloudflare
 //          Workers runtime that already serves this site.
 //
-// SECURITY: This file is the ONLY place the Groq API key is read. It is bound at
-//          runtime as an encrypted secret (env.GROQ_API_KEY) and is never
+// SECURITY: This file is the ONLY place the Anthropic API key is read. It is
+//          bound at runtime as an encrypted secret (env.ANTHROPIC_API_KEY) and is never
 //          imported by, inlined into, or exposed to client code. There is no
 //          NEXT_PUBLIC_ equivalent and there must never be one.
 // =============================================================================
@@ -29,8 +29,8 @@ import {
 // Runtime bindings supplied by Cloudflare Pages (Settings → Variables & secrets)
 // -----------------------------------------------------------------------------
 interface Env {
-  GROQ_API_KEY: string; // Encrypted secret. Server-side only.
-  GROQ_MODEL?: string; // Optional plaintext override; see modelCandidates below.
+  ANTHROPIC_API_KEY: string; // Encrypted secret. Server-side only.
+  ANTHROPIC_MODEL?: string; // Optional plaintext override; see modelCandidates below.
   RATE_LIMIT?: KVNamespace; // KV namespace backing the IP rate limiter.
 }
 
@@ -38,33 +38,30 @@ interface Env {
 // Model selection, in preference order.
 //
 // WHY A CHAIN AND NOT A SINGLE ID: this site went dark once already because it
-// pinned `llama-3.3-70b-versatile`, which Groq shut down on 2026-08-16. Every
-// request then failed with a 404 and the assistant showed "Something went wrong"
-// to every visitor. A hardcoded single model makes a provider deprecation an
-// outage, and deprecations are routine and pre-announced by email that nobody
-// reads. So we carry an ordered list and fall through it.
+// pinned a single model that its provider (then Groq) shut down; every request
+// failed and the assistant showed "Something went wrong" to every visitor. A
+// hardcoded single model makes a provider deprecation an outage, so we carry an
+// ordered list and fall through it.
 //
 // Only *model availability* failures advance the chain (see isModelUnavailable).
 // Rate limits, auth failures and outages must NOT, because retrying those on a
 // different model would multiply load and mask the real problem.
 //
-// All three are on Groq's Production list, and the latter two are Groq's own
-// documented replacements for the model this site used to run.
+// IDs from https://platform.claude.com/docs/en/about-claude/models/overview.
 // -----------------------------------------------------------------------------
 const MODEL_CHAIN = [
-  "openai/gpt-oss-120b", // Groq's recommended replacement for llama-3.3-70b.
-  "qwen/qwen3.6-27b", // Second recommended replacement; different family.
-  "openai/gpt-oss-20b", // Smallest/cheapest, last resort so we degrade rather than fail.
+  "claude-haiku-5-5", // Fastest and cheapest; plenty for a scoped product FAQ.
+  "claude-sonnet-5-5", // Fallback if Haiku is unavailable to this key.
 ] as const;
 
-// Models known to be retired. GROQ_MODEL is operator-supplied and lives in the
-// Cloudflare dashboard, where it is easy to set once and forget for a year, so a
-// stale value there must not be able to break the site.
+// Models known to be retired, or IDs from the previous provider. The model
+// override lives in the Cloudflare dashboard, where it is easy to set once and
+// forget for a year, so a stale value there must not be able to break the site.
 const RETIRED_MODELS = new Set([
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-20b",
+  "qwen/qwen3.6-27b",
   "llama-3.3-70b-versatile",
-  "llama-3.1-8b-instant",
-  "qwen/qwen3-32b",
-  "meta-llama/llama-4-scout-17b-16e-instruct",
 ]);
 
 // Builds the ordered candidate list: the operator's override first (when it is
@@ -86,15 +83,16 @@ function isModelUnavailable(status: number, body: string): boolean {
 
   const haystack = body.toLowerCase();
   return (
+    haystack.includes("not_found_error") ||
     haystack.includes("model_not_found") ||
-    haystack.includes("model_decommissioned") ||
     haystack.includes("does not exist") ||
-    haystack.includes("has been decommissioned") ||
+    haystack.includes("deprecated") ||
     haystack.includes("no longer supported")
   );
 }
 
-const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
+const ANTHROPIC_ENDPOINT = "https://api.anthropic.com/v1/messages";
+const ANTHROPIC_VERSION = "2023-06-01";
 
 // -----------------------------------------------------------------------------
 // Guardrails
@@ -130,12 +128,15 @@ function parseMessages(input: unknown): ChatMessage[] | null {
   if (cleaned.length === 0) return null;
   if (cleaned[cleaned.length - 1].role !== "user") return null;
 
-  // Keep only the most recent turns (a turn being a user/assistant pair).
-  return cleaned.slice(-(MAX_HISTORY_TURNS * 2));
+  // Keep only the most recent turns (a turn being a user/assistant pair). The
+  // Messages API requires the conversation to open with a user turn.
+  const recent = cleaned.slice(-(MAX_HISTORY_TURNS * 2));
+  while (recent.length > 0 && recent[0].role !== "user") recent.shift();
+  return recent;
 }
 
 // -----------------------------------------------------------------------------
-// Translates Groq's SSE stream into a plain UTF-8 text stream of content deltas,
+// Translates Anthropic's SSE stream into a plain UTF-8 text stream of content deltas,
 // so the browser can append tokens directly without parsing SSE itself.
 // -----------------------------------------------------------------------------
 function toTextStream(upstream: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
@@ -163,13 +164,21 @@ function toTextStream(upstream: ReadableStream<Uint8Array>): ReadableStream<Uint
             if (!trimmed.startsWith("data:")) continue;
 
             const payload = trimmed.slice(5).trim();
-            if (payload === "" || payload === "[DONE]") continue;
+            if (payload === "") continue;
 
             try {
               const parsed = JSON.parse(payload) as {
-                choices?: { delta?: { content?: string } }[];
+                type?: string;
+                delta?: { type?: string; text?: string };
+                error?: { type?: string };
               };
-              const token = parsed.choices?.[0]?.delta?.content;
+              if (parsed.type === "error") {
+                console.error("Anthropic stream error", parsed.error?.type);
+                continue;
+              }
+              if (parsed.type !== "content_block_delta") continue;
+              if (parsed.delta?.type !== "text_delta") continue;
+              const token = parsed.delta.text;
               if (token) controller.enqueue(encoder.encode(token));
             } catch {
               // A malformed frame should not kill an otherwise good stream.
@@ -217,9 +226,9 @@ export const onRequestPost = async (context: {
     return json({ error: "Invalid messages payload." }, 400);
   }
 
-  if (!env.GROQ_API_KEY) {
+  if (!env.ANTHROPIC_API_KEY) {
     // Misconfiguration, not a user error — surface it distinctly in logs.
-    console.error("GROQ_API_KEY is not bound to this environment.");
+    console.error("ANTHROPIC_API_KEY is not bound to this environment.");
     return json({ error: "Assistant is not configured." }, 503);
   }
 
@@ -227,7 +236,7 @@ export const onRequestPost = async (context: {
   // honoured; anything else is ignored rather than echoed into the prompt.
   const focus = findProduct((body as { product?: unknown })?.product);
   const systemPrompt = buildSystemPrompt(focus);
-  const candidates = modelCandidates(env.GROQ_MODEL);
+  const candidates = modelCandidates(env.ANTHROPIC_MODEL);
 
   // Walk the candidate models. The body is only read on the failure path, so an
   // unconsumed successful response can still be streamed straight through.
@@ -237,18 +246,19 @@ export const onRequestPost = async (context: {
 
     let upstream: Response;
     try {
-      upstream = await fetch(GROQ_ENDPOINT, {
+      upstream = await fetch(ANTHROPIC_ENDPOINT, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${env.GROQ_API_KEY}`,
+          "x-api-key": env.ANTHROPIC_API_KEY,
+          "anthropic-version": ANTHROPIC_VERSION,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           model,
-          temperature: 0.3,
           max_tokens: 700,
           stream: true,
-          messages: [{ role: "system", content: systemPrompt }, ...messages],
+          system: systemPrompt,
+          messages,
         }),
       });
     } catch {
@@ -272,12 +282,13 @@ export const onRequestPost = async (context: {
     // Log the provider's reason server-side; never forward it to the client,
     // since provider errors can echo request details.
     const detail = await upstream.text().catch(() => "");
-    console.error(`Groq request failed (model=${model})`, upstream.status, detail);
+    console.error(`Anthropic request failed (model=${model})`, upstream.status, detail);
 
     // The provider throttling us is a distinct, recoverable condition. Masking
     // it as a generic 502 told users "something went wrong" when the honest
     // answer is "we are busy, try again shortly".
-    if (upstream.status === 429) {
+    // 529 is Anthropic's "overloaded" status.
+    if (upstream.status === 429 || upstream.status === 529) {
       return json({ error: "upstream_busy" }, 429);
     }
 
