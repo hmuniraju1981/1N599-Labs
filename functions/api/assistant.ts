@@ -16,7 +16,7 @@
 //          NEXT_PUBLIC_ equivalent and there must never be one.
 // =============================================================================
 
-import { buildSystemPrompt } from "../../content/knowledge";
+import { buildSystemPrompt, findProduct } from "../../content/knowledge";
 import {
   clientIp,
   isRateLimited,
@@ -223,7 +223,10 @@ export const onRequestPost = async (context: {
     return json({ error: "Assistant is not configured." }, 503);
   }
 
-  const systemPrompt = buildSystemPrompt();
+  // Optional product focus from the side panel. Only a known product id is
+  // honoured; anything else is ignored rather than echoed into the prompt.
+  const focus = findProduct((body as { product?: unknown })?.product);
+  const systemPrompt = buildSystemPrompt(focus);
   const candidates = modelCandidates(env.GROQ_MODEL);
 
   // Walk the candidate models. The body is only read on the failure path, so an
