@@ -1,19 +1,15 @@
 // =============================================================================
 // FILE: src/components/layout/SpaceScene.tsx
-// PURPOSE: One continuous space scene spanning BOTH the hero and the AI
-//          assistant section. Previously each section owned its own background,
-//          which produced a hard horizontal line where the photograph stopped
-//          and a flat near-black band began.
+// PURPOSE: The space scene behind the full-screen hero. The AI assistant used
+//          to sit inside it too; it now has its own screen below, so the
+//          photograph fills exactly one viewport with nothing laid over it.
 //
 //          Everything visual lives here now:
 //            LAYER 1  the photograph, brightened, with the Ken Burns drift
 //            LAYER 2  the starfield canvas
 //            LAYER 3  a full-bleed radial scrim for text legibility
 //            LAYER 4  a vertical fade into whatever section comes next
-//          Children (hero, assistant) render above all of it, transparent.
-//
-//          Because the wrapper spans both sections, the drift and the starfield
-//          continue behind the assistant card instead of stopping mid-page.
+//          Children (the hero) render above all of it, transparent.
 // =============================================================================
 
 "use client";
@@ -90,13 +86,15 @@ export default function SpaceScene({ children }: { children: React.ReactNode }) 
           it to the hero keeps it behind the text it exists to protect. */}
 
       {/* ------------------------------------ LAYER 3 — fade into next section */}
+      {/* Only the last ~18% fades, so the photograph reads in full and the
+          seam into the assistant's near-black screen is still soft. */}
       <div
         aria-hidden="true"
         data-testid="scene-fade"
         className="absolute inset-0 z-[3] pointer-events-none"
         style={{
           background:
-            "linear-gradient(to bottom, transparent 55%, rgba(3,7,18,0.75) 85%, #030712 100%)",
+            "linear-gradient(to bottom, transparent 82%, rgba(3,7,18,0.6) 94%, #030712 100%)",
         }}
       />
 

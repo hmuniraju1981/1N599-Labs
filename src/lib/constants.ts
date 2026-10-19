@@ -20,6 +20,7 @@ import { LegalLink, NavLink, Stat } from "@/types";
 export const NAV_LINKS: NavLink[] = [
   { href: "/#about", label: "About" },       // Scrolls to the About section
   { href: "/#products", label: "Products" },  // Scrolls to the Products section
+  { href: "/#assistant", label: "Ask AI" },  // Full-screen product assistant
   { href: "/#mission", label: "Mission" },    // Scrolls to the Mission section
   { href: "/#contact", label: "Contact" },    // Scrolls to the Team + Contact section
 ];

@@ -7,19 +7,21 @@
 //          which wraps both this section and the AI assistant so the two read
 //          as one continuous sky. See src/components/layout/SpaceScene.tsx.
 //
-//          Geometry is unchanged: 78vh keeps the top of the assistant card above
-//          the fold, and pt-20 clears the fixed navbar.
+//          The hero fills the whole first screen (100svh) so the photograph is
+//          shown in full; the assistant has its own screen below. pt-20 clears
+//          the fixed navbar.
 // =============================================================================
 
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 
 export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-[78vh] flex items-center justify-center pt-20 pb-8"
+      className="relative min-h-[100svh] flex items-center justify-center pt-20 pb-16"
     >
       {/* Radial text scrim, full-bleed across the hero. It spans the entire hero
           box, and its gradient reaches full transparency well inside every edge,
@@ -81,6 +83,15 @@ export default function Hero() {
           </a>
         </div>
       </div>
+
+      <a
+        href="#assistant"
+        aria-label="Ask our AI assistant"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 text-[11px] uppercase tracking-[0.2em] text-slate-300 hover:text-cyan-300 transition-colors"
+      >
+        Ask AI
+        <ChevronDown className="w-5 h-5 animate-bounce" aria-hidden="true" />
+      </a>
     </section>
   );
 }
