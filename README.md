@@ -65,7 +65,7 @@ src/
 │   │   ├── index.ts              #     Barrel exports
 │   │   ├── Hero.tsx              #     Full-screen hero with 3D background + CTAs
 │   │   ├── About.tsx             #     Company intro + 3 feature cards
-│   │   ├── Products.tsx          #     Industry domain cards (RE/HR/Healthcare)
+│   │   ├── Products.tsx          #     Four linked product tiles (from content/knowledge.ts)
 │   │   ├── Mission.tsx           #     "For you always" statement + stats
 │   │   ├── Founder.tsx           #     Founder profile + social links
 │   │   └── Contact.tsx           #     Contact info, form, and footer

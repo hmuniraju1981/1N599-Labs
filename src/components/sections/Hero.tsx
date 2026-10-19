@@ -14,8 +14,8 @@
 
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import Logo from "@/components/ui/Logo";
+import NextSectionCue from "@/components/ui/NextSectionCue";
 
 export default function Hero() {
   return (
@@ -84,14 +84,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <a
-        href="#assistant"
-        aria-label="Ask our AI assistant"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 text-[11px] uppercase tracking-[0.2em] text-slate-300 hover:text-cyan-300 transition-colors"
-      >
-        Ask AI
-        <ChevronDown className="w-5 h-5 animate-bounce" aria-hidden="true" />
-      </a>
+      <NextSectionCue href="#assistant" label="Ask AI" />
     </section>
   );
 }

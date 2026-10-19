@@ -4,6 +4,7 @@
 // =============================================================================
 
 import { MISSION_STATS } from "@/lib/constants";
+import NextSectionCue from "@/components/ui/NextSectionCue";
 
 export default function Mission() {
   return (
@@ -47,6 +48,7 @@ export default function Mission() {
           ))}
         </div>
       </div>
+      <NextSectionCue href="#contact" label="Team & Contact" />
     </section>
   );
 }

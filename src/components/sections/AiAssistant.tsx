@@ -34,6 +34,7 @@ import {
   type Product,
 } from "../../../content/knowledge";
 import { completeOnboardingStep } from "@/lib/onboarding";
+import NextSectionCue from "@/components/ui/NextSectionCue";
 
 type Role = "user" | "assistant";
 interface Message {
@@ -610,6 +611,7 @@ export default function AiAssistant() {
       >
         <ChevronDown className="h-6 w-6 animate-bounce text-cyan-400" aria-hidden="true" />
       </a>
+      <NextSectionCue href="#about" label="About" />
     </section>
   );
 }
