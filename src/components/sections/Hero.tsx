@@ -15,7 +15,6 @@
 "use client";
 
 import Logo from "@/components/ui/Logo";
-import NextSectionCue from "@/components/ui/NextSectionCue";
 
 export default function Hero() {
   return (
@@ -84,7 +83,6 @@ export default function Hero() {
         </div>
       </div>
 
-      <NextSectionCue href="#assistant" label="Ask AI" />
     </section>
   );
 }

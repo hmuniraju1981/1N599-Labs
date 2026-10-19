@@ -16,6 +16,7 @@ import Products from "@/components/sections/Products";   // Industry domain show
 import Mission from "@/components/sections/Mission";     // Mission statement + stats
 import Founder from "@/components/sections/Founder";     // Team + Contact combined section
 import OnboardingChecklist from "@/components/ui/OnboardingChecklist";
+import SectionNavigator from "@/components/ui/SectionNavigator";
 import { SITE_JSON_LD } from "@/lib/seo";
 
 // -----------------------------------------------------------------------------
@@ -46,6 +47,7 @@ export default function Home() {
       <Mission />   {/* #mission — mission statement + stats */}
       <Founder />   {/* #contact — Team + Contact combined */}
       <OnboardingChecklist />
+      <SectionNavigator /> {/* Floating next-section / back-to-top button */}
     </main>
   );
 }

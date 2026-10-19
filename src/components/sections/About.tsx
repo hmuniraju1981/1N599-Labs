@@ -6,7 +6,6 @@
 // =============================================================================
 
 import { Brain, Sparkles, Zap } from "lucide-react";
-import NextSectionCue from "@/components/ui/NextSectionCue";
 
 const features = [
   {
@@ -67,7 +66,6 @@ export default function About() {
           ))}
         </div>
       </div>
-      <NextSectionCue href="#products" label="Products" />
     </section>
   );
 }
