@@ -43,7 +43,7 @@ export default function Home() {
       </SpaceScene>
       <AiAssistant />   {/* #assistant — its own full screen, product-only Q&A */}
       <About />     {/* #about — AI-first, domain expertise, rapid innovation */}
-      <Products />  {/* #products — four linked product tiles */}
+      <Products />  {/* #products — linked product tiles */}
       <Mission />   {/* #mission — mission statement + stats */}
       <Founder />   {/* #contact — Team + Contact combined */}
       <OnboardingChecklist />

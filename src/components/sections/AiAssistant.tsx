@@ -338,7 +338,7 @@ export default function AiAssistant() {
   const productButton = (product: Product | null, compact: boolean) => {
     const active = (product?.id ?? null) === focusId;
     const name = product ? product.name : ASSISTANT_UI.allProductsLabel;
-    const sub = product ? product.category : "Ask across all four";
+    const sub = product ? product.category : "Ask across all three";
     return (
       <button
         key={product?.id ?? "all"}
@@ -453,7 +453,7 @@ export default function AiAssistant() {
                     ))}
                   </div>
                   <p className="text-xs leading-relaxed text-slate-400">
-                    Four products, one assistant. Pick a product to focus the answers.
+                    Three products, one assistant. Pick a product to focus the answers.
                   </p>
                 </>
               )}

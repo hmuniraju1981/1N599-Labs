@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: src/components/sections/Products.tsx
-// PURPOSE: The four 1N599 products as linked tiles (logo, category, one-line
+// PURPOSE: The 1N599 products as linked tiles (logo, category, one-line
 //          summary, website), followed by how we build for other industries.
 //          Product data comes from content/knowledge.ts, the same source the
 //          AI assistant answers from, so the tiles and the assistant agree.
@@ -10,17 +10,10 @@
 
 import Image from "next/image";
 import { ArrowUpRight, CloudCog, Workflow } from "lucide-react";
-import { completeOnboardingStep } from "@/lib/onboarding";
 import { PRODUCTS } from "../../../content/knowledge";
 
 // Per-product accent: glow behind the tile, hover border, and link colour.
 const ACCENTS: Record<string, { glow: string; border: string; text: string; chip: string }> = {
-  thereelty: {
-    glow: "from-violet-500/30 via-fuchsia-500/10 to-transparent",
-    border: "group-hover:border-violet-400/50",
-    text: "text-violet-300",
-    chip: "border-violet-400/30 bg-violet-500/10 text-violet-200",
-  },
   medifisys: {
     glow: "from-emerald-500/30 via-teal-500/10 to-transparent",
     border: "group-hover:border-emerald-400/50",
@@ -86,12 +79,12 @@ export default function Products() {
             Our <span className="gradient-text">Products</span>
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-slate-400">
-            AI products built for real estate, healthcare, hiring and marketing.
+            AI products built for healthcare, hiring and marketing.
             Pick one to visit its website.
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {PRODUCTS.map((product) => {
             const accent = ACCENTS[product.id] ?? ACCENTS.sourced;
             return (
@@ -101,11 +94,6 @@ export default function Products() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${product.name}: ${product.summary} Visit ${hostname(product.url)}`}
-                onClick={
-                  product.id === "thereelty"
-                    ? () => completeOnboardingStep("opened_the_reelty")
-                    : undefined
-                }
                 className={`group relative flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm transition-all duration-500 hover:-translate-y-1 hover:bg-white/[0.05] hover:shadow-2xl hover:shadow-black/40 ${accent.border}`}
               >
                 <div

@@ -9,6 +9,7 @@
 
 import { COMPANY, LEGAL_LINKS } from "@/lib/constants";
 import { SITE_URL } from "@/lib/seo";
+import { PRODUCTS } from "../../../content/knowledge";
 
 // Same static-export requirement as sitemap.ts / robots.ts.
 export const dynamic = "force-static";
@@ -17,7 +18,7 @@ export function GET() {
   const { address: a, founder: f } = COMPANY;
   const body = `# ${COMPANY.name}
 
-> ${COMPANY.name} is a product-based AI company with a business address in Austin, Texas. It has built an AI real estate product, ${COMPANY.productName}, and builds and customizes AI products for opportunities in any industry. Mission: "${COMPANY.mission}."
+> ${COMPANY.name} is a product-based AI company with a business address in Austin, Texas. It builds AI products for healthcare, hiring and marketing, and builds and customizes AI products for opportunities in any industry. Mission: "${COMPANY.mission}."
 
 - Website: ${SITE_URL}
 - ${f.title}: ${f.name}
@@ -26,7 +27,7 @@ export function GET() {
 
 ## Products
 
-- [${COMPANY.productName}](${COMPANY.productUrl}): AI-powered real estate product that supports property workflows, insights and decisions for real estate professionals. Runs on its own website, separate from ${COMPANY.domain}.
+${PRODUCTS.map((p) => `- [${p.name}](${p.url}): ${p.summary} Runs on its own website, separate from ${COMPANY.domain}.`).join("\n")}
 - Custom AI products: ${COMPANY.name} applies its product-building experience to new industries — designing, building, integrating and scaling AI products around a customer's users, workflows, data and market.
 
 ## Company

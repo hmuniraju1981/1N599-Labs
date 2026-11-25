@@ -5,8 +5,8 @@
 //          Optional PostHog analytics is loaded only after consent. Necessary
 //          storage (this choice, and homepage onboarding progress) lives in
 //          localStorage on this origin. Advertising pixels are not used.
-//          Conversations are not stored. TheReelty is a separate origin and
-//          does not share cookies with this site.
+//          Conversations are not stored. Our product websites are separate
+//          origins and do not share cookies with this site.
 // =============================================================================
 
 import type { Metadata } from "next";
@@ -30,9 +30,9 @@ export default function CookiePolicy() {
         <p>
           <Term>The short version.</Term> We ask before running analytics. If you
           accept, PostHog may set cookies on this site and record page views plus
-          five named events. If you choose essential only — or you never choose —
-          those cookies are not set. We do not use advertising cookies.{" "}
-          {COMPANY.productName} is a separate app and does not share cookies with
+          four named events. If you choose essential only — or you never choose —
+          those cookies are not set. We do not use advertising cookies. Our
+          product websites are separate apps and do not share cookies with
           this website.
         </p>
       </Callout>
@@ -63,7 +63,7 @@ export default function CookiePolicy() {
           <LI>
             <Term>Homepage getting-started progress.</Term> Stored in localStorage
             under <code className="text-cyan-300 text-sm">1n599-onboarding</code>{" "}
-            so the five-step checklist can pick up where you left off. It is not
+            so the four-step checklist can pick up where you left off. It is not
             used to identify you across sites.
           </LI>
           <LI>
@@ -78,7 +78,7 @@ export default function CookiePolicy() {
           on {COMPANY.domain} so it can tell returning browsers apart for
           measurement. It records page views and these events, in this order when
           you take the matching action: <Term>asked_assistant</Term>,{" "}
-          <Term>explored_products</Term>, <Term>opened_the_reelty</Term>,{" "}
+          <Term>explored_products</Term>,{" "}
           <Term>sent_enquiry</Term>, <Term>shared_with_teammate</Term>. It does
           not receive assistant transcripts, contact-form contents, or advertising
           audiences.
@@ -107,12 +107,9 @@ export default function CookiePolicy() {
           font provider. PostHog is requested only after you accept analytics.
         </P>
         <P>
-          {COMPANY.productName} at{" "}
-          <A href={COMPANY.productUrl}>
-            {COMPANY.productUrl.replace(/^https:\/\//, "")}
-          </A>{" "}
-          is a different origin. Opening it does not send this site&rsquo;s cookies
-          there, and that product&rsquo;s cookies are not set on {COMPANY.domain}.
+          Our product websites each run on a different origin. Opening one does
+          not send this site&rsquo;s cookies there, and those products&rsquo;
+          cookies are not set on {COMPANY.domain}.
         </P>
       </Clause>
 

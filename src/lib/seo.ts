@@ -9,6 +9,7 @@
 
 import type { Metadata } from "next";
 import { COMPANY, legalLink } from "@/lib/constants";
+import { PRODUCTS } from "../../content/knowledge";
 
 export const SITE_URL = `https://${COMPANY.domain}`;
 export const OG_IMAGE = `${SITE_URL}/og-image.png`;
@@ -56,7 +57,7 @@ export const SITE_JSON_LD = {
       logo: `${SITE_URL}/logo.svg`,
       image: OG_IMAGE,
       description:
-        "1N599 Inc is a product-based AI company with a real estate product, building and customizing intelligent products for opportunities in any industry.",
+        "1N599 Inc is a product-based AI company building intelligent products for healthcare, hiring and marketing, and customizing AI products for opportunities in any industry.",
       slogan: COMPANY.mission,
       email: COMPANY.email,
       address: {
@@ -80,14 +81,13 @@ export const SITE_JSON_LD = {
         // resolves to a different user, so it is deliberately left out.
         sameAs: [founder.resumeUrl],
       },
-      owns: {
+      owns: PRODUCTS.map((p) => ({
         "@type": "SoftwareApplication",
-        name: COMPANY.productName,
-        url: COMPANY.productUrl,
+        name: p.name,
+        url: p.url,
         applicationCategory: "BusinessApplication",
-        description:
-          "AI-powered real estate product that supports property workflows, insights and decisions for industry professionals.",
-      },
+        description: p.summary,
+      })),
     },
     {
       "@type": "WebSite",

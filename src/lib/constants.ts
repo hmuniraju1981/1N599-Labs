@@ -108,7 +108,7 @@ export function legalLink(href: string): LegalLink {
 // Displayed as highlight cards within the Mission section.
 // -----------------------------------------------------------------------------
 export const MISSION_STATS: Stat[] = [
-  { number: "4+", label: "AI Products & Growing" }, // Shipping products; see PRODUCTS in content/knowledge.ts
+  { number: "3+", label: "AI Products & Growing" }, // Shipping products; see PRODUCTS in content/knowledge.ts
   { number: "Any", label: "Industry Opportunity" }, // Our core approach
   { number: "∞", label: "Commitment to You" },     // Symbolizes endless dedication
 ];
@@ -120,10 +120,6 @@ export const MISSION_STATS: Stat[] = [
 export const COMPANY = {
   name: "1N599 Inc",                                 // Legal company name
   domain: "1n599inc.ai",                            // Primary domain
-  // The company landing (this host) and the product app are separate origins.
-  // Cookies, localStorage and consent are not shared between them.
-  productName: "TheReelty",
-  productUrl: "https://www.thereelty.com",
   // Lowercase deliberately. Mailbox names are technically case-sensitive per
   // RFC 5321, and although every real provider treats them as insensitive,
   // displaying "contact@1n599Inc.ai" invited people to retype it with the

@@ -2,7 +2,7 @@
 
 **"For you always"**
 
-Product-based AI company with an existing real estate product, building and customizing intelligent products for opportunities across any industry.
+Product-based AI company building intelligent products for healthcare, hiring and marketing, and customizing AI products for opportunities across any industry.
 
 🌐 [1n599inc.ai](https://1n599inc.ai)
 
@@ -65,7 +65,7 @@ src/
 │   │   ├── index.ts              #     Barrel exports
 │   │   ├── Hero.tsx              #     Full-screen hero with 3D background + CTAs
 │   │   ├── About.tsx             #     Company intro + 3 feature cards
-│   │   ├── Products.tsx          #     Four linked product tiles (from content/knowledge.ts)
+│   │   ├── Products.tsx          #     Linked product tiles (from content/knowledge.ts)
 │   │   ├── Mission.tsx           #     "For you always" statement + stats
 │   │   ├── Founder.tsx           #     Founder profile + social links
 │   │   └── Contact.tsx           #     Contact info, form, and footer

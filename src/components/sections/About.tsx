@@ -15,8 +15,8 @@ const features = [
   },
   {
     icon: <Sparkles className="w-8 h-8" />,
-    title: "Proven in Real Estate",
-    desc: "Our real estate product applies AI to practical industry needs and provides a foundation for continued innovation.",
+    title: "Proven in Production",
+    desc: "Our shipping AI products apply intelligence to practical industry needs and provide a foundation for continued innovation.",
   },
   {
     icon: <Zap className="w-8 h-8" />,
@@ -42,8 +42,8 @@ export default function About() {
             Building the <span className="gradient-text">Future</span> with AI
           </h2>
           <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
-            1N599 Inc is a product-based AI company. We have built a real estate
-            product and continue to create intelligent products that solve practical
+            1N599 Inc is a product-based AI company. We build intelligent
+            products for healthcare, hiring and marketing that solve practical
             business problems. We also welcome opportunities to build and customize
             AI products for organizations in any industry.
           </p>

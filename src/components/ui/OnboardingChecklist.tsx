@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: src/components/ui/OnboardingChecklist.tsx
-// PURPOSE: Homepage-only five-step getting-started checklist.
+// PURPOSE: Homepage-only getting-started checklist.
 //
 //          Collapsible until every step is done. Progress is local to this
 //          origin (localStorage key 1n599-onboarding). Completing a step also
@@ -28,7 +28,6 @@ import {
   subscribeOnboarding,
   type FunnelEvent,
 } from "@/lib/onboarding";
-import OpenTheReeltyLink from "@/components/sections/OpenTheReeltyLink";
 
 const SITE_URL = `https://${COMPANY.domain}`;
 
@@ -123,7 +122,7 @@ export default function OnboardingChecklist() {
               Getting started
             </span>
             <span className="block text-xs text-slate-400">
-              {done ? "All five steps complete" : `${count} of ${FUNNEL_EVENTS.length} complete`}
+              {done ? `All ${FUNNEL_EVENTS.length} steps complete` : `${count} of ${FUNNEL_EVENTS.length} complete`}
             </span>
           </button>
           <button
@@ -183,11 +182,6 @@ export default function OnboardingChecklist() {
                       >
                         Go there
                       </a>
-                    ) : null}
-                    {!isDone && step.id === "opened_the_reelty" ? (
-                      <div className="mt-2">
-                        <OpenTheReeltyLink compact />
-                      </div>
                     ) : null}
                     {!isDone && step.id === "shared_with_teammate" ? (
                       <button

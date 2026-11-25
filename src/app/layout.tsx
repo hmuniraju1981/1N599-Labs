@@ -47,13 +47,15 @@ export const metadata: Metadata = {
   title: "1N599 Inc | AI Products Built for Any Industry",
   // Meta description for search engines (max ~160 chars recommended)
   description:
-    "1N599 Inc is a product-based AI company with a real estate product, building and customizing intelligent products for opportunities in any industry.",
+    "1N599 Inc is a product-based AI company building intelligent products for healthcare, hiring and marketing, and customizing AI products for opportunities in any industry.",
   // SEO keywords (less impactful for modern Google but still used by other engines)
   keywords: [
     "AI",
     "artificial intelligence",
     "AI products",
-    "real estate AI",
+    "healthcare AI",
+    "hiring AI",
+    "marketing AI",
     "custom AI product development",
     "1N599 Inc",
   ],
@@ -70,7 +72,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "1N599 Inc | Engineering Intelligence, Empowering Humanity", // Social share title
     description:
-      "Product-based AI innovation, proven in real estate and customizable for any industry.", // Social share description
+      "Product-based AI innovation across healthcare, hiring and marketing, customizable for any industry.", // Social share description
     url: SITE_URL,
     siteName: COMPANY.name,
     type: "website",
@@ -88,7 +90,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "1N599 Inc | Engineering Intelligence, Empowering Humanity",
     description:
-      "Product-based AI innovation, proven in real estate and customizable for any industry.",
+      "Product-based AI innovation across healthcare, hiring and marketing, customizable for any industry.",
     images: [OG_IMAGE],
   },
 };

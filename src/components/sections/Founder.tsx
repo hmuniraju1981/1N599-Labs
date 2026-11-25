@@ -46,9 +46,9 @@ export default function Founder() {
         {/* Team description card */}
         <div className="glow-card glass rounded-3xl p-8 sm:p-10 mb-12 text-center max-w-3xl mx-auto">
           <p className="text-lg text-slate-200 leading-relaxed">
-            Our team builds and grows intelligent products, starting with our real estate
-            solution. We also welcome product opportunities in any industry and can customize
-            AI capabilities around your market, workflows, users, and goals.
+            Our team builds and grows intelligent products across healthcare, hiring
+            and marketing. We also welcome product opportunities in any industry and
+            can customize AI capabilities around your market, workflows, users, and goals.
           </p>
         </div>
 

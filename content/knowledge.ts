@@ -5,7 +5,7 @@
 //          from here. Edit this file to change what the assistant knows.
 //
 // IMPORTANT: The assistant is instructed to answer ONLY from this file, and
-//            ONLY about the four products below. If you add a claim here it
+//            ONLY about the products below. If you add a claim here it
 //            becomes something the assistant will assert as true, so only add
 //            facts each product's own website publishes (its /llms.txt and
 //            home page). If you remove a claim, the assistant stops saying it.
@@ -40,38 +40,6 @@ export interface Product {
 }
 
 export const PRODUCTS: readonly Product[] = [
-  {
-    id: "thereelty",
-    name: "TheReelty",
-    url: "https://thereelty.com",
-    logo: "/products/thereelty.png",
-    category: "Real estate",
-    tagline: "Agentic AI for real estate",
-    summary:
-      "List, market and close property deals with AI, from listing copy and reels to offers, forms and CRM.",
-    facts: [
-      "Real estate technology platform (SaaS) operated by 1N599 Inc (dba TheReelty), serving the United States with Texas-specific features: TREC promulgated forms and TREC licence verification.",
-      "Owners publish a property for sale or for rent without a listing agent: a public listing page, AI-generated listing descriptions, photo and video upload, virtual staging credits, short video reels on TheReelty's feed, tour scheduling and a showing inbox, direct messaging with buyers and renters, offers received/countered/accepted in the platform, and Texas promulgated forms.",
-      "You do not need a real estate licence to advertise a property you own. Advertising someone else's property needs a licence, which TheReelty verifies against the state regulator (TREC in Texas, ARELLO elsewhere).",
-      "Agents and brokers get a lead pipeline and CRM with leads from listings and reels, unlimited listings, MLS import over the RESO API, AI video creation, virtual staging credits, commission tracking, and per-seat brokerage teams.",
-      "Trade and service businesses (electricians, plumbers, HVAC, landscaping, cleaning, inspection, photography and more) get a ProConnect profile, reels of finished jobs and work requests straight to an inbox — no bidding, no lead resale, no per-lead fee. Trade professionals join by invitation.",
-      "Also: AI virtual staging (first image free, no listing required), Agentic CMA (market analysis and comps), AI Video Studio for shareable listing reels, AI email and text with Spanish translation, document generation, Formwright (fill a state form from an existing customer and send it to sign, $89 per document), RMLO and title workflows, and property management (leases, maintenance requests, work orders) at pm.thereelty.com.",
-      "An Android app is on Google Play. Contact: support@thereelty.com.",
-    ],
-    pricing: [
-      "Starter — free: 1 active listing, AI listing descriptions, photo uploads, tour scheduling. No credit card.",
-      "DIY Seller / Buyer — $199/month per property, publishing included, virtual staging, Texas forms.",
-      "Agent — $349/month: unlimited listings, CRM, AI video studio, MLS import, commission tracking.",
-      "Brokerage — $999/month: everything in Agent plus team features.",
-      "Vendor — $125/month: ProConnect placement, service reels, lead access, profile and reviews.",
-      "Monthly plans can be cancelled anytime. Current prices: https://www.thereelty.com/pricing",
-    ],
-    prompts: [
-      "Can I sell my home without an agent?",
-      "What do agents get on TheReelty?",
-      "How much does TheReelty cost?",
-    ],
-  },
   {
     id: "medifisys",
     name: "Medifisys",
@@ -164,27 +132,12 @@ export function findProduct(id: unknown): Product | undefined {
 }
 
 // -----------------------------------------------------------------------------
-// HARD NEGATIVES
-// Things people commonly assume a real estate AI does, that TheReelty does NOT.
-// -----------------------------------------------------------------------------
-export const NEVER_CLAIM = [
-  "3D or AR walkthroughs",
-  "digital keys",
-  "Zillow import",
-  "AI photo enhancement",
-  "AI pricing recommendations",
-  "AI tenant matching or screening",
-  "drone capture",
-] as const;
-
-// -----------------------------------------------------------------------------
 // SUGGESTED PROMPTS for the "All products" view. Each product view uses its
 // own `prompts` instead.
 // -----------------------------------------------------------------------------
 export const SUGGESTED_PROMPTS = [
   "What products does 1N599 offer?",
   "Which product is right for my business?",
-  "What is TheReelty?",
   "What is Medifisys?",
   "What is BonafideHire?",
   "What is Sourced?",
@@ -196,7 +149,7 @@ export const SUGGESTED_PROMPTS = [
 export const ASSISTANT_UI = {
   eyebrow: "1N599 AI Assistant",
   title: "What do you want to know?",
-  subtitle: "Ask anything about TheReelty, Medifisys, BonafideHire or Sourced.",
+  subtitle: "Ask anything about Medifisys, BonafideHire or Sourced.",
   allProductsLabel: "All products",
   productsHeading: "Our products",
   followUpLabel: "Try asking",
@@ -227,26 +180,25 @@ Pricing:
 ${p.pricing.map((f) => `- ${f}`).join("\n")}`,
   ).join("\n\n");
 
-  const negatives = NEVER_CLAIM.map((n) => `- ${n}`).join("\n");
   const names = PRODUCTS.map((p) => p.name).join(", ");
 
   const focusBlock = focus
     ? `\n# CURRENT FOCUS
 The visitor selected ${focus.name} in the product panel. Assume questions are
-about ${focus.name} unless they clearly name another of the four products.\n`
+about ${focus.name} unless they clearly name another of the three products.\n`
     : "";
 
   return `You are the AI assistant on the ${COMPANY.name} website. ${COMPANY.name}
-("${COMPANY.positioning}") makes exactly four products: ${names}.
+("${COMPANY.positioning}") makes exactly three products: ${names}.
 
 # SCOPE — THE FIRST RULE
-You answer questions about these four products ONLY: what they do, who they are
+You answer questions about these three products ONLY: what they do, who they are
 for, how they work, pricing, and which one fits a visitor's need. Comparing them
 or recommending one is in scope.
 
 Anything else — general knowledge, coding, writing tasks, news, advice
 (medical, legal, financial), other companies' products — is out of scope.
-Decline it in ONE short sentence and offer to help with one of the four
+Decline it in ONE short sentence and offer to help with one of the three
 products instead. Do not partially answer an out-of-scope question.
 
 Medifisys questions about a patient's own condition or treatment choice are
@@ -262,9 +214,6 @@ timelines, customer counts, case studies, metrics or statistics. If asked for
 something not covered, say plainly that you don't have that detail and point
 to the product's website. Prices can change — when quoting one, it is fine to
 point to the product's pricing page.
-
-TheReelty does NOT offer any of the following; never claim it does:
-${negatives}
 
 # VOICE
 Sharp, concise, technically fluent. Short paragraphs or tight bullets. No gush,

@@ -4,7 +4,7 @@
 //
 //          Progress is stored in localStorage under ONBOARDING_STORAGE_KEY so it
 //          survives reloads on this origin only. It is never sent to the server
-//          and is not shared with the product app (www.thereelty.com).
+//          and is not shared with our product websites (separate origins).
 //
 //          Completing a step also records the same-named PostHog event, but only
 //          when the visitor has consented to analytics — see posthog.tsx.
@@ -17,7 +17,6 @@ export const ONBOARDING_STORAGE_KEY = "1n599-onboarding";
 export const FUNNEL_EVENTS = [
   "asked_assistant",
   "explored_products",
-  "opened_the_reelty",
   "sent_enquiry",
   "shared_with_teammate",
 ] as const;
@@ -39,14 +38,8 @@ export const ONBOARDING_STEPS: readonly {
   {
     id: "explored_products",
     title: "Explore products",
-    description: "Look through what we build, starting with real estate.",
+    description: "Look through what we build across our products.",
     href: "/#products",
-  },
-  {
-    id: "opened_the_reelty",
-    title: "Open TheReelty",
-    description:
-      "Visit our real estate product. It is a separate app — cookies are not shared with this site.",
   },
   {
     id: "sent_enquiry",

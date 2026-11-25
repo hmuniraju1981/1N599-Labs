@@ -6,8 +6,8 @@
 //          every export here is a no-op — the site still deploys, the banner
 //          still records a choice, and no third-party request is made.
 //
-//          Do not point this at TheReelty's PostHog project. This host needs its
-//          own 1N599 Inc project key.
+//          Do not point this at another product's PostHog project. This host
+//          needs its own 1N599 Inc project key.
 // =============================================================================
 
 "use client";

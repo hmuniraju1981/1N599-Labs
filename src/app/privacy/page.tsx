@@ -51,15 +51,13 @@ export default function PrivacyPolicy() {
           <Term>The short version.</Term> We only receive personal information when
           you choose to send it (a contact-form message, or whatever you type into
           the AI assistant), plus optional analytics if you accept the cookie
-          banner. Analytics is PostHog; it records page views and five named
+          banner. Analytics is PostHog; it records page views and four named
           events — <Term>asked_assistant</Term>, <Term>explored_products</Term>,{" "}
-          <Term>opened_the_reelty</Term>, <Term>sent_enquiry</Term>,{" "}
-          <Term>shared_with_teammate</Term> — and it does not receive the contents
-          of your assistant conversation. We do not use advertising pixels, we do
-          not sell personal information, and we never use it to build advertising
-          profiles. Our product app, {COMPANY.productName}, is a separate site at{" "}
-          {COMPANY.productUrl.replace(/^https:\/\//, "")} and does not share cookies
-          with this one.
+          <Term>sent_enquiry</Term>, <Term>shared_with_teammate</Term> — and it
+          does not receive the contents of your assistant conversation. We do
+          not use advertising pixels, we do not sell personal information, and
+          we never use it to build advertising profiles. Our product websites
+          are separate origins and do not share cookies with this one.
         </p>
       </Callout>
 
@@ -108,10 +106,9 @@ export default function PrivacyPolicy() {
           <Definition term="Optional analytics (PostHog)">
             If you accept analytics on the cookie banner, we load PostHog in your
             browser. It then records that you visited a page on this site, and may
-            record these five events when you take the matching action:{" "}
+            record these four events when you take the matching action:{" "}
             <Term>asked_assistant</Term> (you send a message to the assistant),{" "}
             <Term>explored_products</Term> (the products section comes into view),{" "}
-            <Term>opened_the_reelty</Term> (you open {COMPANY.productName}),{" "}
             <Term>sent_enquiry</Term> (the contact form is accepted), and{" "}
             <Term>shared_with_teammate</Term> (you use the share control). The
             event is a name only — we do not attach the text of your question, your
@@ -122,7 +119,7 @@ export default function PrivacyPolicy() {
           <Definition term="Consent and onboarding storage">
             Your analytics choice is kept in localStorage on this device under the
             key <code className="text-cyan-300 text-sm">1n599-consent</code>. On the
-            homepage, a getting-started checklist stores which of the five steps
+            homepage, a getting-started checklist stores which of the four steps
             you have finished under{" "}
             <code className="text-cyan-300 text-sm">1n599-onboarding</code>. That
             progress stays in your browser; we do not read it on the server.
@@ -196,7 +193,7 @@ export default function PrivacyPolicy() {
           <LI>
             <Term>To understand how this landing site is used</Term> — only if you
             accept analytics. We use that to see whether people find the assistant,
-            the products, {COMPANY.productName}, the contact form, and the share
+            the products, the contact form, and the share
             control.
           </LI>
           <LI>
@@ -260,7 +257,7 @@ export default function PrivacyPolicy() {
 
           <Definition term="PostHog, Inc. — product analytics (only with consent)">
             If you accept analytics, your browser loads PostHog and sends it page
-            views and the five events named in section 2. PostHog is a processor
+            views and the four events named in section 2. PostHog is a processor
             acting on our instructions for this website. It is not loaded if you
             refuse, and it is not sent assistant transcripts or contact-form
             contents. See{" "}
@@ -269,12 +266,10 @@ export default function PrivacyPolicy() {
         </DefinitionList>
 
         <P>
-          {COMPANY.productName} at{" "}
-          <A href={COMPANY.productUrl}>{COMPANY.productUrl.replace(/^https:\/\//, "")}</A>{" "}
-          is a separate product on a separate origin. This website does not share
-          cookies, localStorage or consent with it. Use of {COMPANY.productName} is
-          governed by that product&rsquo;s own terms and privacy notice, not by this
-          page.
+          Our product websites each run on a separate origin. This website does
+          not share cookies, localStorage or consent with them, and each product
+          is governed by that product&rsquo;s own terms and privacy notice, not
+          by this page.
         </P>
 
         <P>
@@ -407,7 +402,7 @@ export default function PrivacyPolicy() {
           consumers under 16. The categories of personal information we collect are
           identifiers (email address, name, IP address) and internet activity
           information (request metadata, and — only with your consent — page views
-          and the five analytics events named in section 2), together with the
+          and the four analytics events named in section 2), together with the
           contents of communications you choose to send us, as described in section
           2. We do not use or disclose sensitive personal information for purposes
           requiring a right to limit.
